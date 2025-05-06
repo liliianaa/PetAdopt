@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
+              TextFormField(
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Kata sandi',
@@ -90,6 +90,12 @@ class _LoginPageState extends State<LoginPage> {
                     borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nama tidak boleh kosong';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 8),
               Row(
