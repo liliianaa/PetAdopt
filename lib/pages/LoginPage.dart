@@ -34,46 +34,26 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colorconfig.mainblue,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    // Navigasi ke halaman daftar
-                  },
-                  child: const Text.rich(
-                    TextSpan(
-                      text: 'Jika belum punya akun\n',
-                      style: TextStyle(color: Colors.black),
-                      children: [
-                        TextSpan(
-                            text: 'Daftar di sini!',
-                            style: TextStyle(color: Colorconfig.mainblue)),
-                      ],
-                    ),
-                  ),
+                  color: ColorConfig.mainblue,
                 ),
               ),
               const SizedBox(height: 24),
               const TextField(
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: TextStyle(color: Colorconfig.mainblue),
+                  labelStyle: TextStyle(color: ColorConfig.mainblue),
                   hintText: 'Masukkan email anda',
                   hintStyle: TextStyle(fontSize: 14),
                   prefixIcon: Icon(
                     Icons.email_outlined,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                   border: OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                 ),
               ),
@@ -82,18 +62,18 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Kata sandi',
-                  labelStyle: const TextStyle(color: Colorconfig.mainblue),
+                  labelStyle: const TextStyle(color: ColorConfig.mainblue),
                   hintText: 'Masukkan kata sandi anda',
                   hintStyle: const TextStyle(fontSize: 14),
                   prefixIcon: const Icon(
                     Icons.lock_clock_outlined,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(_obscurePassword
                         ? Icons.visibility_off
                         : Icons.visibility),
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                     onPressed: () {
                       setState(() {
                         _obscurePassword = !_obscurePassword;
@@ -102,10 +82,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   border: const OutlineInputBorder(),
                   enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                 ),
               ),
@@ -140,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colorconfig.mainblue,
+                    backgroundColor: ColorConfig.mainblue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -157,7 +137,28 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Center(
+                child: Align(
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigasi ke halaman daftar
+                    },
+                    child: const Text.rich(
+                      TextSpan(
+                        text: 'Belum punya akun? ',
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                              text: 'Daftar',
+                              style: TextStyle(color: ColorConfig.mainblue)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               const Text('atau masuk dengan'),
               const SizedBox(height: 12),
               const Row(
