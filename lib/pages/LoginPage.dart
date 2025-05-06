@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:petadopt/config/ColorConfig.dart';
+import 'package:petadopt/pages/LoginPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:petadopt/pages/RegisterPage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -142,7 +144,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: Align(
                   child: GestureDetector(
                     onTap: () {
-                      // Navigasi ke halaman daftar
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Registerpage()),
+                      );
                     },
                     child: const Text.rich(
                       TextSpan(
