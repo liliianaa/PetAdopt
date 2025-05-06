@@ -3,14 +3,14 @@ import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/pages/LoginPage.dart';
 import 'package:petadopt/pages/RegisterPage.dart';
 
-class SpalshPage extends StatefulWidget {
-  const SpalshPage({super.key});
+class LandingPage extends StatefulWidget {
+  const LandingPage({super.key});
 
   @override
-  State<SpalshPage> createState() => _SpalshPageState();
+  State<LandingPage> createState() => _LandingPageState();
 }
 
-class _SpalshPageState extends State<SpalshPage> {
+class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +38,7 @@ class _SpalshPageState extends State<SpalshPage> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -47,7 +47,7 @@ class _SpalshPageState extends State<SpalshPage> {
                   "Kasih Kata Slogan",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -72,7 +72,7 @@ class _SpalshPageState extends State<SpalshPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colorconfig.mainblue,
+                    backgroundColor: ColorConfig.mainblue,
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -95,7 +95,7 @@ class _SpalshPageState extends State<SpalshPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colorconfig.mainbabyblue,
+                    backgroundColor: ColorConfig.mainbabyblue,
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
