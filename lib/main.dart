@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petadopt/pages/LoginPage.dart';
-import 'package:petadopt/pages/SpalshPage.dart';
-import 'package:petadopt/pages/RegisterPage.dart';
+import 'package:petadopt/pages/LandingPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SpalshPage(),
+      home: const LandingPage(),
     );
   }
 }

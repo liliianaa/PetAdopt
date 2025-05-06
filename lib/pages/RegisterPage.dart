@@ -10,7 +10,6 @@ class Registerpage extends StatefulWidget {
 }
 
 class _RegisterpageState extends State<Registerpage> {
-  bool _rememberMe = false;
   bool _obscurePassword = true;
 
   @override
@@ -34,46 +33,26 @@ class _RegisterpageState extends State<Registerpage> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colorconfig.mainblue,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    // Navigasi ke halaman daftar
-                  },
-                  child: const Text.rich(
-                    TextSpan(
-                      text: 'Jika belum punya akun\n',
-                      style: TextStyle(color: Colors.black),
-                      children: [
-                        TextSpan(
-                            text: 'Daftar di sini!',
-                            style: TextStyle(color: Colorconfig.mainblue)),
-                      ],
-                    ),
-                  ),
+                  color: ColorConfig.mainblue,
                 ),
               ),
               const SizedBox(height: 15),
               const TextField(
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: TextStyle(color: Colorconfig.mainblue),
+                  labelStyle: TextStyle(color: ColorConfig.mainblue),
                   hintText: 'Masukkan email anda',
                   hintStyle: TextStyle(fontSize: 14),
                   prefixIcon: Icon(
                     Icons.email_outlined,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                   border: OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                 ),
               ),
@@ -81,19 +60,19 @@ class _RegisterpageState extends State<Registerpage> {
               const TextField(
                 decoration: InputDecoration(
                   labelText: 'Nama Pengguna',
-                  labelStyle: TextStyle(color: Colorconfig.mainblue),
+                  labelStyle: TextStyle(color: ColorConfig.mainblue),
                   hintText: 'Masukkan nama anda',
                   hintStyle: TextStyle(fontSize: 14),
                   prefixIcon: Icon(
                     Icons.person_2_outlined,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                   border: OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                 ),
               ),
@@ -102,18 +81,18 @@ class _RegisterpageState extends State<Registerpage> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Kata sandi',
-                  labelStyle: const TextStyle(color: Colorconfig.mainblue),
+                  labelStyle: const TextStyle(color: ColorConfig.mainblue),
                   hintText: 'Masukkan kata sandi anda',
                   hintStyle: const TextStyle(fontSize: 14),
                   prefixIcon: const Icon(
                     Icons.lock_clock_outlined,
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(_obscurePassword
                         ? Icons.visibility_off
                         : Icons.visibility),
-                    color: Colorconfig.mainblue,
+                    color: ColorConfig.mainblue,
                     onPressed: () {
                       setState(() {
                         _obscurePassword = !_obscurePassword;
@@ -122,37 +101,12 @@ class _RegisterpageState extends State<Registerpage> {
                   ),
                   border: const OutlineInputBorder(),
                   enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colorconfig.mainblue),
+                    borderSide: BorderSide(color: ColorConfig.mainblue),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _rememberMe,
-                        onChanged: (value) {
-                          setState(() {
-                            _rememberMe = value ?? false;
-                          });
-                        },
-                      ),
-                      const Text('Remember me'),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // Navigasi ke lupa sandi
-                    },
-                    child: const Text('Lupa kata sandi?'),
-                  ),
-                ],
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -160,7 +114,7 @@ class _RegisterpageState extends State<Registerpage> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colorconfig.mainblue,
+                    backgroundColor: ColorConfig.mainblue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -169,10 +123,31 @@ class _RegisterpageState extends State<Registerpage> {
                     // Aksi untuk Register
                   },
                   child: const Text(
-                    'Masuk',
+                    'Daftar',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: Align(
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigasi ke halaman daftar
+                    },
+                    child: const Text.rich(
+                      TextSpan(
+                        text: 'Sudah punya akun? ',
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                              text: 'Masuk',
+                              style: TextStyle(color: ColorConfig.mainblue)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
