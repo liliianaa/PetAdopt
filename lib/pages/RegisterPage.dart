@@ -3,6 +3,10 @@ import 'package:petadopt/config/ColorConfig.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:petadopt/pages/LoginPage.dart';
 import 'package:petadopt/pages/MainPage.dart';
+import 'package:provider/provider.dart';
+import 'package:petadopt/providers/auth_model.dart';
+import 'package:petadopt/models/auth_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Registerpage extends StatefulWidget {
   const Registerpage({super.key});
@@ -12,8 +16,20 @@ class Registerpage extends StatefulWidget {
 }
 
 class _RegisterpageState extends State<Registerpage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _nameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +59,7 @@ class _RegisterpageState extends State<Registerpage> {
                 ),
                 const SizedBox(height: 15),
                 TextFormField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     labelStyle: TextStyle(color: ColorConfig.mainblue),
@@ -69,6 +86,7 @@ class _RegisterpageState extends State<Registerpage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Nama Pengguna',
                     labelStyle: TextStyle(color: ColorConfig.mainblue),
@@ -95,6 +113,7 @@ class _RegisterpageState extends State<Registerpage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Kata sandi',
@@ -142,12 +161,34 @@ class _RegisterpageState extends State<Registerpage> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        Navigator.push(
+                        final authProvider =
+                            Provider.of<AuthProvider>(context, listen: false);
+                        await authProvider.register(Register(
+                          name: _nameController.text,
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        ));
+
+                        if (authProvider.state == AuthState.success) {
+                          // Simpan email dan password ke SharedPreferences
+                          final prefs = await SharedPreferences.getInstance();
+                          prefs.setString('email', _emailController.text);
+                          prefs.setString('password', _passwordController.text);
+                          prefs.setBool('rememberMe', true);
+
+                          // Navigasi ke halaman utama setelah registrasi berhasil
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MainPage()));
+                                builder: (context) => const MainPage()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(authProvider.message)),
+                          );
+                        }
                       }
                     },
                     child: const Text(

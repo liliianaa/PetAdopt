@@ -44,13 +44,47 @@ class _MainPageState extends State<MainPage> {
         Image.asset('assets/logo.png', height: 60),
         Row(
           children: [
-            Icon(Icons.notifications_none),
+            const Icon(Icons.notifications_none),
             const SizedBox(width: 12),
-            Icon(Icons.list),
+            GestureDetector(
+              onTapDown: (details) {
+                _showPopupMenu(details.globalPosition);
+              },
+              child: const Icon(Icons.list),
+            ),
           ],
         ),
       ],
     );
+  }
+
+  void _showPopupMenu(Offset position) async {
+    final selected = await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+          position.dx, position.dy, position.dx, position.dy),
+      items: [
+        const PopupMenuItem(value: 'chat', child: Text('Chat')),
+        const PopupMenuItem(value: 'favorit', child: Text('Hewan Favorit')),
+        const PopupMenuItem(value: 'komunitas', child: Text('Komunitas')),
+      ],
+      color: Colors.white, // ini buat ganti background popup jadi putih
+      elevation: 8.0,
+    );
+
+    if (selected != null) {
+      switch (selected) {
+        case 'chat':
+          print('Navigasi ke Chat');
+          break;
+        case 'favorit':
+          print('Navigasi ke Hewan Favorit');
+          break;
+        case 'komunitas':
+          print('Navigasi ke Komunitas');
+          break;
+      }
+    }
   }
 
   Widget _buildSearchBar() {
@@ -77,7 +111,7 @@ class _MainPageState extends State<MainPage> {
           children: [
             _buildKategoriIcon('assets/kucing1.png', 'Kucing'),
             const SizedBox(width: 70),
-            _buildKategoriIcon('assets/logo.png', 'Anjing'),
+            _buildKategoriIcon('assets/anjing4.jpeg', 'Anjing'),
           ],
           mainAxisAlignment: MainAxisAlignment.center,
         ),
@@ -313,10 +347,11 @@ class _MainPageState extends State<MainPage> {
       selectedItemColor: ColorConfig.mainblue,
       unselectedItemColor: Colors.grey,
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Katalog'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle), label: 'Tambah Hewan'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
       ],
     );
   }
