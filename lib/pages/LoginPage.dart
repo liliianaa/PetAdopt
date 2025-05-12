@@ -4,6 +4,10 @@ import 'package:petadopt/pages/LoginPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/RegisterPage.dart';
+import 'package:petadopt/models/auth_model.dart';
+import 'package:petadopt/providers/auth_model.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,11 +24,13 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  void _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rememberMe = prefs.getBool('rememberMe') ?? false;
+
+    setState(() {
+      _rememberMe = rememberMe;
+    });
   }
 
   @override
@@ -55,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     labelStyle: TextStyle(color: ColorConfig.mainblue),
@@ -81,6 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Kata sandi',
@@ -125,10 +133,28 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Checkbox(
                           value: _rememberMe,
-                          onChanged: (value) {
+                          onChanged: (value) async {
                             setState(() {
                               _rememberMe = value ?? false;
                             });
+
+                            final prefs = await SharedPreferences.getInstance();
+
+                            if (_rememberMe) {
+                              // Load data saat dicentang
+                              setState(() {
+                                _emailController.text =
+                                    prefs.getString('email') ?? '';
+                                _passwordController.text =
+                                    prefs.getString('password') ?? '';
+                              });
+                            } else {
+                              // Clear data saat tidak dicentang
+                              setState(() {
+                                _emailController.clear();
+                                _passwordController.clear();
+                              });
+                            }
                           },
                         ),
                         const Text('Remember me'),
@@ -153,12 +179,42 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MainPage()));
+                    onPressed: () async {
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      await authProvider.login(Login(
+                        email: _emailController.text,
+                        password: _passwordController.text,
+                      ));
+
+                      if (authProvider.state == AuthState.success) {
+                        // Ambil token dari SharedPreferences
+                        final prefs = await SharedPreferences.getInstance();
+                        final token = prefs.getString('token');
+
+                        // Simpan email, password, dan remember me status ke SharedPreferences jika rememberMe true
+                        if (_rememberMe) {
+                          prefs.setString('email', _emailController.text);
+                          prefs.setString('password', _passwordController.text);
+                          prefs.setBool('rememberMe', true);
+                        } else {
+                          prefs.remove('email');
+                          prefs.remove('password');
+                          prefs.remove('rememberMe');
+                        }
+
+                        // Cetak token ke konsol
+                        print('TOKEN: $token');
+
+                        // Navigasi ke MainPage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => MainPage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(authProvider.message)),
+                        );
                       }
                     },
                     child: const Text(
