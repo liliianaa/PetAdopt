@@ -4,18 +4,18 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:petadopt/pages/LoginPage.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:provider/provider.dart';
-import 'package:petadopt/providers/auth_model.dart';
+import 'package:petadopt/providers/auth_provider.dart';
 import 'package:petadopt/models/auth_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Registerpage extends StatefulWidget {
-  const Registerpage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<Registerpage> createState() => _RegisterpageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterpageState extends State<Registerpage> {
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
