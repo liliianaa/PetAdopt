@@ -9,11 +9,13 @@ class Register {
     required this.password,
   });
 
-  factory Register.fromJson(Map<String, dynamic> json) => Register(
-        name: json["name"],
-        email: json["email"],
-        password: json["password"],
-      );
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'email': email,
+      'password': password,
+    };
+  }
 }
 
 class Login {
@@ -25,25 +27,57 @@ class Login {
     required this.password,
   });
 
-  factory Login.fromJson(Map<String, dynamic> json) => Login(
-        email: json["email"],
-        password: json["password"],
-      );
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'password': password,
+    };
+  }
 }
 
 class LoginResponse {
-  final String message;
   final String token;
+  final String message;
+  final Map<String, dynamic>? errors;
 
   LoginResponse({
-    required this.message,
     required this.token,
+    required this.message,
+    this.errors,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-      message: json['message'],
-      token: json['data']['token'],
+      token: json['data']?['token'] ?? '',  // <-- fix di sini
+      message: json['message'] ?? '',
+      errors: json['errors'],
     );
+  }
+}
+
+class AuthModel {
+  final String token;
+  final String message;
+
+  AuthModel({
+    required this.token,
+    required this.message,
+  });
+
+  factory AuthModel.fromJson(Map<String, dynamic> json) {
+    return AuthModel(
+      token: json['token'],
+      message: json['message'],
+    );
+  }
+}
+
+class AuthResponse {
+  final String message;
+
+  AuthResponse({required this.message});
+
+  factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    return AuthResponse(message: json['message']);
   }
 }

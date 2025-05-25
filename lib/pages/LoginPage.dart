@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/RegisterPage.dart';
 import 'package:petadopt/models/auth_model.dart';
-import 'package:petadopt/providers/auth_model.dart';
+import 'package:petadopt/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -187,12 +187,15 @@ class _LoginPageState extends State<LoginPage> {
                         password: _passwordController.text,
                       ));
 
-                      if (authProvider.state == AuthState.success) {
-                        // Ambil token dari SharedPreferences
-                        final prefs = await SharedPreferences.getInstance();
-                        final token = prefs.getString('token');
+                      // 🔍 Tambahkan ini untuk melihat hasil login
+                      print('Login state: ${authProvider.state}');
+                      print('Token: ${authProvider.token}');
+                      print('Message: ${authProvider.message}');
 
-                        // Simpan email, password, dan remember me status ke SharedPreferences jika rememberMe true
+                      if (authProvider.state == AuthState.success) {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('token', authProvider.token);
+
                         if (_rememberMe) {
                           prefs.setString('email', _emailController.text);
                           prefs.setString('password', _passwordController.text);
@@ -203,10 +206,6 @@ class _LoginPageState extends State<LoginPage> {
                           prefs.remove('rememberMe');
                         }
 
-                        // Cetak token ke konsol
-                        print('TOKEN: $token');
-
-                        // Navigasi ke MainPage
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => MainPage()),
@@ -234,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Registerpage()),
+                              builder: (context) => RegisterPage()),
                         );
                       },
                       child: const Text.rich(

@@ -90,7 +90,7 @@ class _LandingPageState extends State<LandingPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const Registerpage(),
+                        builder: (context) => const RegisterPage(),
                       ),
                     );
                   },
