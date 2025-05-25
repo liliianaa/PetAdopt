@@ -1,96 +1,76 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:petadopt/models/auth_model.dart';
-import 'package:petadopt/services/auth_services.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:petadopt/helper/SharedPrefHelper.dart';
 
-enum AuthState {
-  idle,
-  loading,
-  success,
-  failed,
-}
+class Authrepostories {
+  final String _BaseURL = 'http://10.0.2.2:8000/api';
+  final SharedPrefHelper _tokenManager = SharedPrefHelper();
 
-class AuthProvider extends ChangeNotifier {
-  final AuthServices authServices;
-
-  AuthProvider({required this.authServices});
-
-  AuthState _state = AuthState.idle;
-  String _message = '';
-  bool _isAuthenticated = false;
-  String _token = ''; // <- tambahkan ini
-
-  AuthState get state => _state;
-  String get message => _message;
-  bool get isAuthenticated => _isAuthenticated;
-  String get token => _token; // <- getter token
-
-  Future<void> login(Login loginData) async {
-  try {
-    _state = AuthState.loading;
-    notifyListeners();
-
-    final result = await authServices.loginUser(loginData);
-
-    print('[AuthProvider] login result: token=${result?.token}, message=${result?.message}');
-
-    if (result != null && result.token.isNotEmpty) {
-      _state = AuthState.success;
-      _isAuthenticated = true;
-      _message = result.message ?? 'Login berhasil';
-      _token = result.token;
-    } else if (result != null && result.errors != null) {
-      _state = AuthState.failed;
-      final emailErrors = result.errors?["email"];
-      if (emailErrors != null && emailErrors.isNotEmpty) {
-        _message = emailErrors[0];
-      } else {
-        _message = result.message ?? 'Login failed';
-      }
-    } else {
-      _state = AuthState.failed;
-      _message = result?.message ?? 'Login failed';
-    }
-  } catch (e) {
-    _state = AuthState.failed;
-    if (e is SocketException) {
-      _message = 'No Internet Connection';
-    } else {
-      _message = 'Login Error';
-    }
-  } finally {
-    notifyListeners();
-  }
-}
-
-  // Metode register tetap sama sesuai kebutuhan
-  Future<void> register(Register registerData) async {
+  //Login
+  Future<Map<String, dynamic>> Login(String email, String password) async {
     try {
-      _state = AuthState.loading;
-      notifyListeners();
+      final response = await http.post(
+        Uri.parse('$_BaseURL/login'),
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: {'email': email, 'password': password},
+      );
+      print("RESPONSE: ${response.body}");
+      final json = jsonDecode(response.body);
 
-      final result = await authServices.registerUser(registerData);
-      if (result != null) {
-        _state = AuthState.success;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final token = json['data']['token'];
+        await _tokenManager.saveToken(token);
+        return {'success': true, 'token': token};
       } else {
-        _state = AuthState.failed;
-        _message = 'Registration failed';
+        // Ambil pesan error dari response Laravel
+        final errorMessage = json['message'] ?? 'Login gagal';
+        return {'success': false, 'message': errorMessage};
       }
-    } on SocketException {
-      _state = AuthState.failed;
-      _message = 'No Internet Connection';
     } catch (e) {
-      _state = AuthState.failed;
-      _message = 'Registration Error: $e';
-    } finally {
-      notifyListeners();
+      return {'success': false, 'message': 'Terjadi kesalahan server.'};
     }
   }
 
-  void logout() {
-    _isAuthenticated = false;
-    _state = AuthState.idle;
-    _message = '';
-    notifyListeners();
+  //register
+  Future<Map<String, dynamic>> Register(
+      String name, String email, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_BaseURL/register'),
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: {'name': name, 'email': email, 'password': password},
+      );
+      print("RESPONSE: ${response.body}");
+      final json = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true};
+      } else {
+        final errorMessage = json['message'] ?? 'Login gagal';
+        return {'success': false, 'message': errorMessage};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Terjadi kesalahan server.'};
+    }
+  }
+
+  //apakah sudah login
+  Future<bool> isLoggedIn() async {
+    return await _tokenManager.isAuth();
+  }
+
+  //logout
+  Future<void> logout() async {
+    await _tokenManager.removeToken();
+  }
+
+  //mendapatkan token
+  Future<String?> getToken() async {
+    return await _tokenManager.getToken();
   }
 }
