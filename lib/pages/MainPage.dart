@@ -91,7 +91,7 @@ class _MainPageState extends State<MainPage>
       case 1:
         return const KatalogPage();
       case 2:
-        return const AddPage();
+      //return const AddPage();
       case 3:
         return const ProfilePage();
       default:

@@ -67,7 +67,7 @@ class _LandingPageState extends State<LandingPage> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
+                        builder: (context) => const LoginPage(isAdd: true),
                       ),
                     );
                   },
@@ -90,7 +90,7 @@ class _LandingPageState extends State<LandingPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
+                        builder: (context) => const RegisterPage(isAdd: true),
                       ),
                     );
                   },
