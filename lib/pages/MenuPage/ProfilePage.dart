@@ -1,93 +1,135 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadopt/bloc/Profile/ProfileBloc.dart';
+import 'package:petadopt/bloc/Profile/ProfileEvent.dart';
+import 'package:petadopt/bloc/Profile/ProfileState.dart';
+import 'package:petadopt/bloc/Auth/AuthBloc.dart'; // Pastikan ini ada
+import 'package:petadopt/bloc/Auth/AuthEvent.dart';
+import 'package:petadopt/bloc/Auth/AuthState.dart';
 import 'package:petadopt/config/ColorConfig.dart';
+import 'package:petadopt/pages/LandingPage.dart';
+import 'package:petadopt/pages/MainPage.dart';
+import 'package:petadopt/pages/MenuPage/MyProfilePage.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorConfig.mainwhite,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(bottom: 30, top: 30, right: 30, left: 5),
-              margin: const EdgeInsets.only(top: 30, bottom: 40),
-              decoration: const BoxDecoration(
-                color: ColorConfig.mainbabyblue,
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    iconSize: 32,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  const CircleAvatar(
-                    radius: 32,
-                    backgroundImage: AssetImage('assets/anjing1.jpeg'),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Sufyaan',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+    return BlocListener<Authbloc, Authstate>(
+      listener: (context, state) {
+        if (state is Authunautenticated) {
+          // Arahkan ke halaman login
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => LandingPage()));
+        }
+      },
+      child: Scaffold(
+        backgroundColor: ColorConfig.mainwhite,
+        body: SafeArea(
+          child: BlocBuilder<Profilebloc, Profilestate>(
+            builder: (context, state) {
+              if (state is Profileloading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ProfileLoaded) {
+                final profile = state.profiledata;
+
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(
+                          bottom: 30, top: 30, right: 30, left: 5),
+                      margin: const EdgeInsets.only(top: 30, bottom: 40),
+                      decoration: const BoxDecoration(
+                        color: ColorConfig.mainbabyblue,
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            iconSize: 32,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainPage()),
+                              );
+                            },
+                            icon: const Icon(Icons.arrow_back),
+                          ),
+                          const CircleAvatar(
+                            radius: 32,
+                            backgroundImage: AssetImage('assets/anjing1.jpeg'),
+                          ),
+                          const SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profile['name'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                profile['email'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            _buildmenuitem(
+                                icon: Icons.person_outline,
+                                title: 'Profil Saya',
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Myprofilepage()));
+                                }),
+                            _buildmenuitem(
+                              icon: Icons.pets_outlined,
+                              title: 'Daftar Hewan Diupload',
+                              onTap: () => {},
+                            ),
+                            _buildmenuitem(
+                              icon: Icons.history,
+                              title: 'Riwayat Pengajuan',
+                              onTap: () => {},
+                            ),
+                            _buildmenuitem(
+                              icon: Icons.lock_outline,
+                              title: 'Ubah Kata Sandi',
+                              onTap: () => {},
+                            ),
+                            _buildmenuitem(
+                              icon: Icons.logout,
+                              title: 'Keluar',
+                              onTap: () => _showLogoutDialog(context),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildmenuitem(
-                      icon: Icons.person_outline,
-                      title: 'Profil Saya',
-                      // onTap: () => {
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         //builder: (context) => Myprofilepage()),
-                      //   )
-                      // },
-                    ),
-                    _buildmenuitem(
-                      icon: Icons.pets_outlined,
-                      title: 'Daftar Hewan Diupload',
-                      onTap: () => {},
-                    ),
-                    _buildmenuitem(
-                      icon: Icons.history,
-                      title: 'Riwayat Pengajuan',
-                      onTap: () => {},
-                    ),
-                    _buildmenuitem(
-                      icon: Icons.lock_outline,
-                      title: 'Ubah Kata Sandi',
-                      onTap: () => {},
-                    ),
-                    _buildmenuitem(
-                      icon: Icons.logout,
-                      title: 'Keluar',
-                      onTap: () => {},
                     ),
                   ],
-                ),
-              ),
-            ),
-          ],
+                );
+              } else if (state is Profileerror) {
+                return Center(child: Text("Error: ${state.message}"));
+              } else {
+                return const Center(child: Text("Tidak ada data profil."));
+              }
+            },
+          ),
         ),
       ),
     );
@@ -105,6 +147,31 @@ class ProfilePage extends StatelessWidget {
         leading: Icon(icon, color: ColorConfig.mainblue),
         title: Text(title, style: TextStyle(color: color)),
         onTap: onTap,
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Konfirmasi Logout'),
+        content: const Text('Apakah Anda yakin ingin keluar dari akun?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop(); // Tutup dialog dulu
+              context
+                  .read<Authbloc>()
+                  .add(AuthLogoutRequest()); // Trigger logout
+            },
+            child: const Text('Keluar'),
+          ),
+        ],
       ),
     );
   }
