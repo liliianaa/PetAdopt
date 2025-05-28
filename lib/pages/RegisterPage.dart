@@ -53,7 +53,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const MainPage()),
+                MaterialPageRoute(
+                    builder: (context) => const LoginPage(isAdd: true)),
               );
             }
           },
