@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:petadopt/bloc/Auth/AuthBloc.dart';
 import 'package:petadopt/bloc/Auth/AuthState.dart';
-import 'package:petadopt/bloc/Profile/ProfileBloc.dart';
-import 'package:petadopt/bloc/Profile/ProfileEvent.dart';
-import 'package:petadopt/bloc/Profile/ProfileState.dart';
+import 'package:petadopt/bloc/Profile/profile_bloc.dart';
+import 'package:petadopt/pages/MenuPage/EditProfilePage.dart';
 import 'package:petadopt/pages/MenuPage/ProfilePage.dart';
 
 class Myprofilepage extends StatefulWidget {
@@ -18,7 +17,7 @@ class _MyprofilepageState extends State<Myprofilepage> {
   @override
   void initState() {
     super.initState();
-    context.read<Profilebloc>().add(fetchProfiledetail());
+    context.read<ProfileBloc>().add(GetProfileDetailEvent());
   }
 
   @override
@@ -28,7 +27,7 @@ class _MyprofilepageState extends State<Myprofilepage> {
         if (state is Authunautenticated) {
           // Arahkan ke halaman login
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ProfilePage()));
+              context, MaterialPageRoute(builder: (context) => Profilepage()));
         }
       },
       child: Scaffold(
@@ -46,11 +45,11 @@ class _MyprofilepageState extends State<Myprofilepage> {
             ),
           ),
         ),
-        body: BlocBuilder<Profilebloc, Profilestate>(
+        body: BlocBuilder<ProfileBloc, ProfileState>(
           builder: (context, state) {
-            if (state is Profileloading) {
+            if (state is ProfileLoading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (state is ProfileLoaded) {
+            } else if (state is ProfileSuccess) {
               final data = state.profiledata;
 
               return Column(
@@ -92,7 +91,13 @@ class _MyprofilepageState extends State<Myprofilepage> {
                       alignment: Alignment.centerRight,
                       margin: const EdgeInsets.only(right: 20),
                       child: GestureDetector(
-                        onTap: () {}, // aksi untuk tombol ini
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Editprofilepage()),
+                          );
+                        }, // aksi untuk tombol ini
                         child: Image.asset(
                           'assets/Group 402.png',
                           width: 40,
@@ -101,8 +106,9 @@ class _MyprofilepageState extends State<Myprofilepage> {
                       )),
                   const SizedBox(height: 24),
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.all(3),
+                    padding: const EdgeInsets.all(40),
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
@@ -137,7 +143,7 @@ class _MyprofilepageState extends State<Myprofilepage> {
                   ),
                 ],
               );
-            } else if (state is Profileerror) {
+            } else if (state is ProfileError) {
               return Center(child: Text("Gagal: ${state.message}"));
             } else {
               return const Center(child: Text("Tidak ada data."));
@@ -158,13 +164,15 @@ class _ProfileField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 18.0),
+      padding: const EdgeInsets.only(bottom: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
               style: const TextStyle(
-                  fontWeight: FontWeight.w600, color: Colors.black87)),
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                  fontSize: 15)),
           const SizedBox(height: 4),
           Text(value, style: const TextStyle(color: Colors.black54)),
           const Divider(height: 20),

@@ -69,7 +69,7 @@ class Profilerepositories {
       );
       final json = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'success': true, 'token': token};
+        return {'success': true, 'data': json['data'], 'token': token};
       } else {
         final errorMessage = json['message'] ?? 'Gagal Update Profile';
         return {'success': false, 'message': errorMessage};
