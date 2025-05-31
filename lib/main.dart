@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:petadopt/bloc/Auth/AuthBloc.dart';
 import 'package:petadopt/bloc/Auth/AuthEvent.dart';
 import 'package:petadopt/bloc/Auth/AuthState.dart';
-import 'package:petadopt/bloc/Profile/ProfileBloc.dart';
-import 'package:petadopt/bloc/Profile/ProfileEvent.dart';
+import 'package:petadopt/bloc/Profile/profile_bloc.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/LandingPage.dart';
 import 'package:petadopt/providers/auth_provider.dart';
@@ -16,7 +15,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final Authrepostories authrepostories = Authrepostories();
-  final Profilerepositories profilrepositories = Profilerepositories();
+  final Profilerepositories repositories = Profilerepositories();
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +25,8 @@ class MyApp extends StatelessWidget {
           create: (_) => Authbloc(authrepostories: authrepostories)
             ..add(AuthCheckStatus()),
         ),
-        BlocProvider<Profilebloc>(
-          create: (_) => Profilebloc(profilerepo: profilrepositories)
-            ..add(fetchProfile()), // bisa juga ..add(fetchProfile())
+        BlocProvider<ProfileBloc>(
+          create: (_) => ProfileBloc(repositories)
         ),
         // BlocProvider<Profiledetailbloc>(
         //   create: (_) => Profiledetailbloc(profilrepo: profilrepositories)

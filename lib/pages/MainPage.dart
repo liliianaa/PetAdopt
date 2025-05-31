@@ -93,7 +93,7 @@ class _MainPageState extends State<MainPage>
       case 2:
       //return const AddPage();
       case 3:
-        return const ProfilePage();
+        return const Profilepage();
       default:
         return HomePage();
     }
