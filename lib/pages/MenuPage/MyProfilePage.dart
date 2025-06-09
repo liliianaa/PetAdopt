@@ -25,7 +25,6 @@ class _MyprofilepageState extends State<Myprofilepage> {
     return BlocListener<Authbloc, Authstate>(
       listener: (context, state) {
         if (state is Authunautenticated) {
-          // Arahkan ke halaman login
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Profilepage()));
         }
@@ -51,7 +50,9 @@ class _MyprofilepageState extends State<Myprofilepage> {
               return const Center(child: CircularProgressIndicator());
             } else if (state is ProfileSuccess) {
               final data = state.profiledata;
-
+              if (data == null) {
+                return const Center(child: Text("Data profil tidak tersedia."));
+              }
               return Column(
                 children: [
                   const SizedBox(height: 10),

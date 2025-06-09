@@ -34,7 +34,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileLoading());
       final response = await repositories.ProfileUpdate(event.name,
           event.tgl_lahir, event.jenis_kelamin, event.no_telp, event.email);
-      if (response['success'] && response['data'] != null) {
+      if (response['success']) {
+        emit(ProfileSuccess(profiledata: response['data']));
+      } else {
+        emit(ProfileError(message: response['message']));
+      }
+    });
+    on<ProfilePassUpdate>((event, emit) async {
+      emit(ProfileLoading());
+      final response = await repositories.ProfilePassUpdate(
+          event.old_password, event.new_password, event.confrim_password);
+      if (response['success']) {
         emit(ProfileSuccess(profiledata: response['data']));
       } else {
         emit(ProfileError(message: response['message']));
