@@ -20,3 +20,15 @@ class UpdateProfileEvent extends ProfileEvent {
       required this.no_telp,
       required this.email});
 }
+
+class ProfilePassUpdate extends ProfileEvent {
+  final String old_password;
+  final String new_password;
+  final String confrim_password;
+
+  ProfilePassUpdate({
+    required this.old_password,
+    required this.new_password,
+    required this.confrim_password,
+  });
+}

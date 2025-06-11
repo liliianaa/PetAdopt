@@ -105,5 +105,14 @@ class HewanBloc extends Bloc<HewanEvent, HewanState> {
             message: response['message'] ?? 'Gagal mengupdate hewan'));
       }
     });
+    on<GetMyPets>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final pets = await hewanrepositories.getmypets();
+        emit(HewanSuccess(hewandata: pets));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
   }
 }

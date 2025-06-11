@@ -270,4 +270,31 @@ class Hewanrepositories {
       };
     }
   }
+
+  Future<List<Datum>> getmypets() async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.get(
+        Uri.parse('$_BaseURL/profile/my-pets'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final data = jsonData['data'];
+        if (data is List) {
+          return data.map((e) => Datum.fromJson(e)).toList();
+        } else {
+          throw Exception('Data tidak valid');
+        }
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }

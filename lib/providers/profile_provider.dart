@@ -11,7 +11,7 @@ class Profilerepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/profile'),
+        Uri.parse('$_BaseURL/`profile'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -69,6 +69,34 @@ class Profilerepositories {
       );
       final json = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true, 'data': json['data'], 'token': token};
+      } else {
+        final errorMessage = json['message'] ?? 'Gagal Update Profile';
+        return {'success': false, 'message': errorMessage};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Terjadi kesalahan server.'};
+    }
+  }
+
+  Future<Map<String, dynamic>> Profilepassupdate(
+      String old_password, String new_password, String confrim_password) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.put(
+        Uri.parse('$_BaseURL/update-password'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+        body: {
+          'old_password': old_password,
+          'new_password': new_password,
+          'new_password_confirmation': confrim_password,
+        },
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200) {
         return {'success': true, 'data': json['data'], 'token': token};
       } else {
         final errorMessage = json['message'] ?? 'Gagal Update Profile';
