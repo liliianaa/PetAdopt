@@ -15,7 +15,7 @@ final class ProfileSuccess extends ProfileState {
 }
 
 final class ProfileError extends ProfileState {
-  final String? message;
+  final String message;
 
   ProfileError({required this.message});
 }

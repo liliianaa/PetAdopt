@@ -8,6 +8,8 @@ import 'package:petadopt/bloc/Profile/profile_bloc.dart';
 import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/pages/LandingPage.dart';
 import 'package:petadopt/pages/MainPage.dart';
+import 'package:petadopt/pages/MenuPage/EditPassPage.dart';
+import 'package:petadopt/pages/MenuPage/ListHewanUploaded.dart';
 import 'package:petadopt/pages/MenuPage/MyProfilePage.dart';
 import 'package:petadopt/providers/profile_provider.dart';
 
@@ -105,7 +107,13 @@ class Profilepage extends StatelessWidget {
                             _buildmenuitem(
                               icon: Icons.pets_outlined,
                               title: 'Daftar hewan yang Diupload',
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            Listhewanuploaded()));
+                              },
                             ),
                             _buildmenuitem(
                               icon: Icons.history,
@@ -115,7 +123,12 @@ class Profilepage extends StatelessWidget {
                             _buildmenuitem(
                               icon: Icons.lock_outlined,
                               title: 'Ubah Kata Sandi',
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Editpasspage()));
+                              },
                             ),
                             _buildmenuitem(
                               icon: Icons.logout,
@@ -169,7 +182,8 @@ class Profilepage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LandingPage()));
               context.read<Authbloc>().add(AuthLogoutRequest());
             },
             child: const Text('Keluar'),

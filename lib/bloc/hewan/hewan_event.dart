@@ -63,3 +63,7 @@ class UpdateHewanEvent extends HewanEvent {
     this.imageFile,
   });
 }
+
+class GetMyPets extends HewanEvent {
+  GetMyPets();
+}
