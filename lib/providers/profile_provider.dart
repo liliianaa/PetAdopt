@@ -4,14 +4,14 @@ import 'package:http/http.dart' as http;
 import 'package:petadopt/helper/SharedPrefHelper.dart';
 
 class Profilerepositories {
-  final String _BaseURL = 'http://10.0.2.2:8000/api';
+  final String _BaseURL = 'http://10.0.2.2:8000/api/user';
   final SharedPrefHelper _tokenManager = SharedPrefHelper();
 
   Future<Map<String, dynamic>> getProfil() async {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/`profile'),
+        Uri.parse('$_BaseURL/profile'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
