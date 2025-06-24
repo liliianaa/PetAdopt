@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dartz/dartz.dart';
 import 'package:petadopt/helper/SharedPrefHelper.dart';
+import 'package:petadopt/model/List_pemohon_model.dart';
+import 'package:petadopt/model/acc_pemohon_model.dart';
 import 'package:petadopt/model/hewan_respon_model.dart';
+import 'package:petadopt/model/pemohonModel.dart';
 
 class Hewanrepositories {
   final String _BaseURL = 'http://10.0.2.2:8000/api';
@@ -275,7 +278,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/profile/my-pets'),
+        Uri.parse('$_BaseURL/user/profile/my-pets'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -289,6 +292,180 @@ class Hewanrepositories {
         } else {
           throw Exception('Data tidak valid');
         }
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<List<Datum>> getPemohonHewanbyID(int id) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.get(
+        Uri.parse('$_BaseURL/user/permohonan/hewan/$id/pemohon'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final data = jsonData['data'];
+        if (data is List) {
+          return data.map((e) => Datum.fromJson(e)).toList();
+        } else {
+          throw Exception('Data tidak valid');
+        }
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Data> getDetailDataPemohon(int id, int userid) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.get(
+        Uri.parse('$_BaseURL/user/permohonan/hewan/$id/user/$userid'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        return Data.fromJson(jsonData['data']);
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Acclistpemohonmodel> Updatestatuspermohonan(
+      int pemohonId, Acclistpemohonmodel accpemohon) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.put(
+        Uri.parse('$_BaseURL/user/permohonan/$pemohonId/status'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: accpemohon.toJson(),
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        return Acclistpemohonmodel.fromJson(jsonData);
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception(error['message'] ?? 'Gagal update status');
+      }
+    } catch (e) {
+      throw Exception('Error saat update status: $e');
+    }
+  }
+
+  Future<List<Listhistorymodel>> getHistoryPermohonan() async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.get(
+        Uri.parse('$_BaseURL/user/permohonan/daftar-permohonan/list-hewan'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final data = jsonData['data'];
+        if (data is List) {
+          return data.map((e) => Listhistorymodel.fromMap(e)).toList();
+        } else {
+          throw Exception('Data tidak valid');
+        }
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Data> getDetailHistoryPemohon(int pemohonid) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.get(
+        Uri.parse('$_BaseURL/user/permohonan/$pemohonid'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final data = jsonData['data'];
+        return Data.fromJson(data);
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Data> DeletePermohonan(int permohonanId) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.delete(
+        Uri.parse('$_BaseURL/user/permohonan/$permohonanId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsondata = jsonDecode(response.body);
+        final data = jsondata['data'];
+        return Data.fromJson(data);
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Data> UpdateDataPemohon(int permohonId, Data listdatapemohon) async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.put(
+        Uri.parse('$_BaseURL/user/permohonan/$permohonId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(listdatapemohon.toJson()),
+      );
+      print("STATUS CODE: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      if (response.statusCode == 200) {
+        final jsondata = jsonDecode(response.body);
+        final data = jsondata['data'];
+        return Data.fromJson(data);
       } else {
         final jsonData = jsonDecode(response.body);
         throw Exception(jsonData['message'] ?? 'Gagal memuat data');

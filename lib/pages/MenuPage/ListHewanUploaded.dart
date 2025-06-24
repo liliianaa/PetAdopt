@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
+import 'package:petadopt/pages/MenuPage/ListPetsAdopter.dart';
+import 'package:petadopt/pages/MenuPage/ProfilePage.dart';
 import 'package:provider/provider.dart';
 
 class Listhewanuploaded extends StatefulWidget {
@@ -30,7 +32,8 @@ class _ListhewanuploadedState extends State<Listhewanuploaded> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.blue),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => Profilepage()));
           },
         ),
         elevation: 0,
@@ -59,73 +62,82 @@ class _ListhewanuploadedState extends State<Listhewanuploaded> {
                 ),
                 itemBuilder: (context, index) {
                   final hewan = hewanlist[index];
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                  return GestureDetector(
+                    onTap: () => {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  Listpetsadopter(hewanID: hewan.id!))),
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            child: Image.network(
+                              _getFullImageUrl(hewan.image ?? ""),
+                              height: 100,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(Icons.image_not_supported,
+                                    size: 100);
+                              },
+                            ),
                           ),
-                          child: Image.network(
-                            'https://th.bing.com/th?q=Elsa+Noviana+Udinus&w=120&h=120&c=1&rs=1&qlt=70&o=7&cb=1&dpr=1.3&pid=InlineBlock&rm=3&mkt=en-ID&cc=ID&setlang=en&adlt=strict&t=1&mw=247',
-                            height: 100,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.image_not_supported,
-                                  size: 100);
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      hewan.nama ?? "",
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        hewan.nama ?? "",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                    hewan.status ?? "",
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10,
+                                    Text(
+                                      hewan.status ?? "",
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 10,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                children: [
-                                  const Icon(Icons.location_on, size: 12),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    hewan.lokasi ?? "",
-                                    style: const TextStyle(fontSize: 13),
-                                  )
-                                ],
-                              )
-                            ],
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on, size: 12),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      hewan.lokasi ?? "",
+                                      style: const TextStyle(fontSize: 13),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },

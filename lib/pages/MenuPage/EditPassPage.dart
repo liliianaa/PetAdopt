@@ -151,12 +151,16 @@ class _MyWidgetState extends State<Editpasspage> {
                         : SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorConfig.mainblue1,
+                                  elevation: 0,
+                                ),
                                 onPressed: _handleSavepassword,
                                 child: const Text(
                                   'Simpan',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: ColorConfig.mainblue,
+                                    color: ColorConfig.mainwhite,
                                   ),
                                 )),
                           ),
