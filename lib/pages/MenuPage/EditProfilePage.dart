@@ -151,10 +151,6 @@ class _EditprofilepageState extends State<Editprofilepage> {
                       if (_formKey.currentState!.validate()) {
                         _handleUpdateProfile(context);
                       }
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Myprofilepage()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorConfig.mainblue1,

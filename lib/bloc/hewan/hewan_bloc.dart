@@ -1,10 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'dart:io';
-
-import 'package:dartz/dartz.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadopt/model/List_pemohon_model.dart';
+import 'package:petadopt/model/acc_pemohon_model.dart';
 import 'package:petadopt/model/hewan_respon_model.dart';
+import 'package:petadopt/model/pemohonModel.dart';
 
 import 'package:petadopt/providers/hewan_provider.dart';
 
@@ -110,6 +112,74 @@ class HewanBloc extends Bloc<HewanEvent, HewanState> {
       try {
         final pets = await hewanrepositories.getmypets();
         emit(HewanSuccess(hewandata: pets));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<GetPemohonHewanbyID>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final pemohon = await hewanrepositories.getPemohonHewanbyID(event.id);
+        emit(HewanSuccess(hewandata: pemohon));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<getDetailPemohon>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final permohon = await hewanrepositories.getDetailDataPemohon(
+            event.id, event.userId);
+        emit(HewanPemohonSuccess(pemohondata: permohon));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<updatestatusPemohon>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final status = await hewanrepositories.Updatestatuspermohonan(
+            event.pemohonId, event.accpemohon);
+        emit(updateStatusPemohonSuccess(statuspemohon: status));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<getHistoryPermohonan>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final history = await hewanrepositories.getHistoryPermohonan();
+        emit(HistoryPermohonanSucces(historypermohonan: history));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<getDetailhistorypemohon>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final detailhistory =
+            await hewanrepositories.getDetailHistoryPemohon(event.pemohonID);
+        emit(HewanPemohonSuccess(pemohondata: detailhistory));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<deletepermohonan>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final deletePermohonan =
+            await hewanrepositories.DeletePermohonan(event.permohonanID);
+        emit(HewanPemohonSuccess(pemohondata: deletePermohonan));
+      } catch (e) {
+        emit(HewanError(message: e.toString()));
+      }
+    });
+    on<EditDataPemohon>((event, emit) async {
+      emit(HewanLoading());
+      try {
+        final datapemohon = await hewanrepositories.UpdateDataPemohon(
+            event.permohonanID, event.datapermohonan);
+        emit(HewanPemohonSuccess(pemohondata: datapemohon));
       } catch (e) {
         emit(HewanError(message: e.toString()));
       }

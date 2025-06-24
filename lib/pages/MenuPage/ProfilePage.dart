@@ -9,6 +9,7 @@ import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/pages/LandingPage.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/MenuPage/EditPassPage.dart';
+import 'package:petadopt/pages/MenuPage/HistoryAdoptionPage.dart';
 import 'package:petadopt/pages/MenuPage/ListHewanUploaded.dart';
 import 'package:petadopt/pages/MenuPage/MyProfilePage.dart';
 import 'package:petadopt/providers/profile_provider.dart';
@@ -118,7 +119,13 @@ class Profilepage extends StatelessWidget {
                             _buildmenuitem(
                               icon: Icons.history,
                               title: 'Riwayat Pengajuan',
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            Historyadoptionpage()));
+                              },
                             ),
                             _buildmenuitem(
                               icon: Icons.lock_outlined,

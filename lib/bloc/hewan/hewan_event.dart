@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'hewan_bloc.dart';
 
 abstract class HewanEvent {}
@@ -66,4 +67,55 @@ class UpdateHewanEvent extends HewanEvent {
 
 class GetMyPets extends HewanEvent {
   GetMyPets();
+}
+
+class GetPemohonHewanbyID extends HewanEvent {
+  final int id;
+  GetPemohonHewanbyID({
+    required this.id,
+  });
+}
+
+class getDetailPemohon extends HewanEvent {
+  final int id;
+  final int userId;
+  getDetailPemohon({
+    required this.id,
+    required this.userId,
+  });
+}
+
+class updatestatusPemohon extends HewanEvent {
+  final int pemohonId;
+  final Acclistpemohonmodel accpemohon;
+  updatestatusPemohon({
+    required this.pemohonId,
+    required this.accpemohon,
+  });
+}
+
+class getHistoryPermohonan extends HewanEvent {
+  getHistoryPermohonan();
+}
+
+class getDetailhistorypemohon extends HewanEvent {
+  final int pemohonID;
+
+  getDetailhistorypemohon({required this.pemohonID});
+}
+
+class deletepermohonan extends HewanEvent {
+  final int permohonanID;
+  deletepermohonan({
+    required this.permohonanID,
+  });
+}
+
+class EditDataPemohon extends HewanEvent {
+  final int permohonanID;
+  final Data datapermohonan;
+  EditDataPemohon({
+    required this.permohonanID,
+    required this.datapermohonan,
+  });
 }
