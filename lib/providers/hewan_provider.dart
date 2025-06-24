@@ -26,6 +26,7 @@ class Hewanrepositories {
     File? imageFile,
   }) async {
     try {
+      //token
       final token = await _tokenManager.getToken();
       final uri = Uri.parse('$_BaseURL/hewan');
       final request = http.MultipartRequest('POST', uri);
