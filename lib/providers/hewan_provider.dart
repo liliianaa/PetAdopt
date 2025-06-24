@@ -11,7 +11,7 @@ import 'package:petadopt/model/hewan_respon_model.dart';
 import 'package:petadopt/model/pemohonModel.dart';
 
 class Hewanrepositories {
-  final String _BaseURL = 'http://10.0.2.2:8000/api';
+  final String _BaseURL = 'http://10.0.2.2:8000/api/user';
   final SharedPrefHelper _tokenManager = SharedPrefHelper();
 
   Future<Either<String, Datum>> addHewan({
