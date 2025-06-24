@@ -9,9 +9,15 @@ final class FavoriteInitial extends FavoriteState {}
 final class FavoriteLoading extends FavoriteState {}
 
 final class FavoriteSuccess extends FavoriteState {
-  final dynamic favoritedata;
+  final PostLiked Postliked;
 
-  FavoriteSuccess({required this.favoritedata});
+  FavoriteSuccess({required this.Postliked});
+}
+
+final class getFavoriteSuccess extends FavoriteState {
+  final Datum getliked;
+
+  getFavoriteSuccess({required this.getliked});
 }
 
 final class FavoriteError extends FavoriteState {

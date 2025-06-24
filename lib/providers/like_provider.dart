@@ -1,54 +1,57 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:petadopt/helper/SharedPrefHelper.dart';
+import 'package:petadopt/model/Like_response.dart';
 
 class FavoriteRepository {
-  final String _baseURL = 'http://10.0.2.2:8000/api';
+  final String _baseURL = 'http://10.0.2.2:8000/api/user';
   final SharedPrefHelper _tokenManager = SharedPrefHelper();
 
   // Toggle Like / Dislike
-  Future<Map<String, dynamic>> toggleLike(int hewanId) async {
+  Future<PostLiked> postLikes(int hewanid, PostLiked postliked) async {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.post(
-        Uri.parse('$_baseURL/like/$hewanId'),
+        Uri.parse('$_baseURL/hewan/$hewanid/like'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
+        body: postliked.toJson(),
       );
-      final json = jsonDecode(response.body);
-
       if (response.statusCode == 200) {
-        return {'success': true, 'message': json['message']};
+        final jsondata = jsonDecode(response.body);
+        final data = jsondata['data'];
+        return PostLiked.fromJson(data);
       } else {
-        return {'success': false, 'message': json['message'] ?? 'Gagal menyukai hewan'};
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      return {'success': false, 'message': 'Terjadi kesalahan server.'};
+      throw Exception(e);
     }
   }
 
-  // Fetch daftar hewan favorit (like terbanyak)
-  Future<Map<String, dynamic>> getFavoriteHewan() async {
+  Future<Datum> getlikes(Datum datalike) async {
     try {
       final token = await _tokenManager.getToken();
-      final response = await http.get(
-        Uri.parse('$_baseURL/hewans/favorites'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      );
-      final json = jsonDecode(response.body);
-
+      final response =
+          await http.get(Uri.parse('$_baseURL/hewan/favorite'), headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      });
       if (response.statusCode == 200) {
-        return {'success': true, 'data': json['data']};
+        final jsondata = jsonDecode(response.body);
+        final data = jsondata['data'];
+        return Datum.fromJson(data);
       } else {
-        return {'success': false, 'message': json['message'] ?? 'Gagal mengambil data'};
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      return {'success': false, 'message': 'Terjadi kesalahan server.'};
+      throw Exception(e);
     }
   }
 }
