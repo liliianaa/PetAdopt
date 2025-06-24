@@ -11,7 +11,7 @@ import 'package:petadopt/model/hewan_respon_model.dart';
 import 'package:petadopt/model/pemohonModel.dart';
 
 class Hewanrepositories {
-  final String _BaseURL = 'http://10.0.2.2:8000/api';
+  final String _BaseURL = 'http://10.0.2.2:8000/api/user';
   final SharedPrefHelper _tokenManager = SharedPrefHelper();
 
   Future<Either<String, Datum>> addHewan({
@@ -26,6 +26,7 @@ class Hewanrepositories {
     File? imageFile,
   }) async {
     try {
+      //token
       final token = await _tokenManager.getToken();
       final uri = Uri.parse('$_BaseURL/hewan');
       final request = http.MultipartRequest('POST', uri);
@@ -35,7 +36,7 @@ class Hewanrepositories {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
       });
-
+      //axshaxha
       // Fields data form
       request.fields.addAll({
         'nama': nama,
