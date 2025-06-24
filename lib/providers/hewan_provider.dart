@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dartz/dartz.dart';
 import 'package:petadopt/helper/SharedPrefHelper.dart';
+import 'package:petadopt/model/hewan_respon_model.dart';
 import 'package:petadopt/model/List_pemohon_model.dart';
 import 'package:petadopt/model/acc_pemohon_model.dart';
 import 'package:petadopt/model/hewan_respon_model.dart';

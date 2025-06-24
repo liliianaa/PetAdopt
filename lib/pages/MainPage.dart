@@ -91,9 +91,9 @@ class _MainPageState extends State<MainPage>
         return HomePage();
       case 1:
         return const KatalogPage();
+      // case 2:
+      //   return const KomunitasPage();
       case 2:
-        return const KomunitasPage();
-      case 3:
         return const Profilepage();
       default:
         return HomePage();
@@ -114,8 +114,8 @@ class _MainPageState extends State<MainPage>
         items: [
           _buildNavItem(Icons.home, 'Home', 0),
           _buildNavItem(Icons.grid_view, 'Katalog', 1),
-          _buildNavItem(Icons.group_add_outlined, 'Komunitas', 2),
-          _buildNavItem(Icons.person, 'Profil', 3),
+          // _buildNavItem(Icons.group_add_outlined, 'Komunitas', 2),
+          _buildNavItem(Icons.person, 'Profil', 2),
         ],
       ),
     );
