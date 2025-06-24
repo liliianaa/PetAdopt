@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "D:/MOBILE/PETADOPT/petadopt/linux"
+  "cmake.sourceDirectory": "D:/MOBILE/PETADOPT/petadopt/linux",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

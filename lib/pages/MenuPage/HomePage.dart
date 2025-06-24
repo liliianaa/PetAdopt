@@ -88,7 +88,7 @@ class HomePage extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => KatalogPage(kategori: label),
+            builder: (context) => KatalogPage(),
           ),
         );
       },

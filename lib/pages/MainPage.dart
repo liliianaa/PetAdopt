@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/helper/SharedPrefHelper.dart';
-import 'package:petadopt/pages/MenuPage/AddPage.dart';
+import 'package:petadopt/pages/MenuPage/AddHewanPage.dart';
 import 'package:petadopt/pages/MenuPage/HomePage.dart';
 import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
+import 'package:petadopt/pages/MenuPage/KomunitasPage.dart';
 import 'package:petadopt/pages/MenuPage/ProfilePage.dart';
 
 class MainPage extends StatefulWidget {
@@ -90,10 +91,10 @@ class _MainPageState extends State<MainPage>
         return HomePage();
       case 1:
         return const KatalogPage();
+      // case 2:
+      //   return const KomunitasPage();
       case 2:
-        return const AddPage();
-      case 3:
-        return const ProfilePage();
+        return const Profilepage();
       default:
         return HomePage();
     }
@@ -113,8 +114,8 @@ class _MainPageState extends State<MainPage>
         items: [
           _buildNavItem(Icons.home, 'Home', 0),
           _buildNavItem(Icons.grid_view, 'Katalog', 1),
-          _buildNavItem(Icons.add_circle_outline, 'Tambah', 2),
-          _buildNavItem(Icons.person, 'Profil', 3),
+          // _buildNavItem(Icons.group_add_outlined, 'Komunitas', 2),
+          _buildNavItem(Icons.person, 'Profil', 2),
         ],
       ),
     );

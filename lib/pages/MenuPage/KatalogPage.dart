@@ -1,256 +1,295 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
 import 'package:petadopt/config/ColorConfig.dart';
-import 'package:petadopt/pages/MainPage.dart';
-import 'package:petadopt/pages/MenuPage/HomePage.dart';
+import 'package:petadopt/model/hewan_respon_model.dart';
+import 'package:petadopt/pages/MenuPage/AddHewanPage.dart';
+import 'package:petadopt/pages/MenuPage/DeskripsiHewanPage.dart';
 
 class KatalogPage extends StatefulWidget {
-  final String kategori;
-
-  const KatalogPage({super.key, this.kategori = 'Semua'});
+  const KatalogPage({super.key});
 
   @override
   State<KatalogPage> createState() => _KatalogPageState();
 }
 
 class _KatalogPageState extends State<KatalogPage> {
-  late String selectedKategori;
+  String selectedJenis = 'Semua';
+  Set<int> favoriteIds = {};
 
   @override
   void initState() {
     super.initState();
-    selectedKategori = widget.kategori;
+    _getHewanByJenis("semua");
   }
 
-  List<Map<String, dynamic>> katalogHewan = [
-    {
-      'img': 'assets/kucing2.jpeg',
-      'nama': 'Kucing Persia',
-      'lokasi': 'Semarang',
-      'kategori': 'Kucing',
-      'isFavorit': true,
-    },
-    {
-      'img': 'assets/anjing4.jpeg',
-      'nama': 'Anjing Buldog',
-      'lokasi': 'Semarang',
-      'kategori': 'Anjing',
-      'isFavorit': false,
-    },
-    {
-      'img': 'assets/anjing4.jpeg',
-      'nama': 'Anjing Pomeranian',
-      'lokasi': 'Semarang',
-      'kategori': 'Anjing',
-      'isFavorit': false,
-    },
-    {
-      'img': 'assets/kucing2.jpeg',
-      'nama': 'Kucing Persia',
-      'lokasi': 'Semarang',
-      'kategori': 'Kucing',
-      'isFavorit': false,
-    },
-    {
-      'img': 'assets/anjing4.jpeg',
-      'nama': 'Anjing Poodle',
-      'lokasi': 'Semarang',
-      'kategori': 'Anjing',
-      'isFavorit': false,
-    },
-  ];
+  void _getHewanByJenis(String jenis) {
+    if (jenis.toLowerCase() == 'semua') {
+      context
+          .read<HewanBloc>()
+          .add(GetHewanEvent()); // event untuk ambil semua hewan
+    } else {
+      context
+          .read<HewanBloc>()
+          .add(GetHewanByJenisEvent(jenis: jenis.toLowerCase()));
+    }
+  }
+
+  void _toggleFavorite(int id) {
+    setState(() {
+      favoriteIds.contains(id) ? favoriteIds.remove(id) : favoriteIds.add(id);
+    });
+  }
+
+  void _onSelectJenis(String jenis) {
+    setState(() {
+      selectedJenis = jenis;
+      _getHewanByJenis(jenis);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ColorConfig.mainblue),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => MainPage()),
-            );
-          },
-        ),
-        title: const Text(
-          'Katalog Hewan',
-          style: TextStyle(
-            color: ColorConfig.mainblue,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        title: const Text("Katalog Hewan"),
+        backgroundColor: ColorConfig.mainbabyblue,
+        centerTitle: true,
+        elevation: 4,
       ),
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildKategori(),
-              const SizedBox(height: 16),
-              Expanded(child: _buildKatalogGrid()),
-            ],
-          ),
+      body: Column(
+        children: [
+          const SizedBox(height: 12),
+          _buildJenisSelector(),
+          const SizedBox(height: 8),
+          Expanded(child: _buildHewanList()),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (_) => AddHewanPage())),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildJenisSelector() {
+    final jenisList = [
+      {
+        'label': 'Semua',
+        'icon': 'https://cdn-icons-png.flaticon.com/512/616/616408.png'
+      },
+      {
+        'label': 'Kucing',
+        'icon': 'https://cdn-icons-png.flaticon.com/512/1998/1998592.png'
+      },
+      {
+        'label': 'Anjing',
+        'icon': 'https://cdn-icons-png.flaticon.com/512/2171/2171990.png'
+      },
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: jenisList
+              .map((jenis) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _hewanSelector(jenis['label']!, jenis['icon']!),
+                  ))
+              .toList(),
         ),
       ),
     );
   }
 
-  Widget _buildKategori() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _kategoriButton(
-            'Semua', 'assets/article1.jpeg'), // ikon all bisa custom
-        const SizedBox(width: 20),
-        _kategoriButton('Kucing', 'assets/kucing1.png'),
-        const SizedBox(width: 20),
-        _kategoriButton('Anjing', 'assets/anjing1.jpeg'),
-      ],
+  Widget _buildHewanList() {
+    return BlocBuilder<HewanBloc, HewanState>(
+      builder: (context, state) {
+        if (state is HewanLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is HewanSuccess) {
+          final data = state.hewandata;
+          if (data.isEmpty) {
+            return const Center(child: Text("Tidak ada data"));
+          }
+
+          return GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 18,
+              crossAxisSpacing: 16,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final item = data[index];
+              final isFavorited = favoriteIds.contains(item.id);
+              return _hewanCard(item, isFavorited);
+            },
+          );
+        } else if (state is HewanError) {
+          return Center(
+            child: Text(
+              state.message ?? "Terjadi kesalahan",
+              style: const TextStyle(color: Colors.red, fontSize: 16),
+            ),
+          );
+        } else {
+          return const SizedBox();
+        }
+      },
     );
   }
 
-  Widget _kategoriButton(String label, String imgPath) {
-    bool isSelected = selectedKategori == label;
+  Widget _hewanSelector(String jenis, String imageUrl) {
+    final isSelected = selectedJenis == jenis;
+    return InkWell(
+      onTap: () => _onSelectJenis(jenis),
+      borderRadius: BorderRadius.circular(40),
+      splashColor: Colors.blue.withOpacity(0.3),
+      child: Container(
+        width: 90,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? ColorConfig.mainbabyblue : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(40),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ClipOval(
+              child: Image.network(imageUrl,
+                  width: 40, height: 40, fit: BoxFit.cover),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              jenis,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : Colors.black54,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _hewanCard(Datum item, bool isFavorited) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedKategori = label;
+        if (item.id != null) {
+          context.read<HewanBloc>().add(GetHewanByIdEvent(id: item.id!));
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => DeskripsiHewanPage(id: item.id!)),
+        ).then((_) {
+          _getHewanByJenis(
+              selectedJenis); // reload data sesuai kategori terpilih
         });
       },
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                  color: isSelected ? Colors.blue : Colors.transparent,
-                  width: 3.5),
-            ),
-            child: CircleAvatar(
-              backgroundImage: AssetImage(imgPath),
-              radius: 30,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.blue : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(color: isSelected ? Colors.white : Colors.black),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKatalogGrid() {
-    var filteredHewan = selectedKategori == 'Semua'
-        ? katalogHewan
-        : katalogHewan
-            .where((item) => item['kategori'] == selectedKategori)
-            .toList();
-
-    return GridView.builder(
-      itemCount: filteredHewan.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.75,
-      ),
-      itemBuilder: (context, index) {
-        var hewan = filteredHewan[index];
-        return _buildKatalogCard(hewan);
-      },
-    );
-  }
-
-  Widget _buildKatalogCard(Map<String, dynamic> hewan) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 4),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.asset(
-                  hewan['img'],
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      hewan['isFavorit'] = !hewan['isFavorit'];
-                    });
-                  },
-                  child: Icon(
-                    hewan['isFavorit'] ? Icons.favorite : Icons.favorite_border,
-                    color: hewan['isFavorit'] ? Colors.red : Colors.white,
-                  ),
-                ),
-              ),
-              const Positioned(
-                bottom: 8,
-                right: 8,
-                child: Card(
-                  color: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    child: Text(
-                      'Sold Out',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        clipBehavior: Clip.hardEdge,
+        child: Stack(
+          children: [
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(hewan['nama'],
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, size: 12),
-                    const SizedBox(width: 4),
-                    Text(hewan['lokasi'], style: const TextStyle(fontSize: 12)),
-                  ],
+                Expanded(
+                  child: CachedNetworkImage(
+                    imageUrl: item.image ?? '',
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error, size: 48, color: Colors.red),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.nama ?? '-',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        item.status?.toUpperCase() ?? 'TERSEDIA',
+                        style: TextStyle(
+                          color: item.status == 'tersedia'
+                              ? Colors.green
+                              : Colors.red,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on,
+                              size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(
+                            item.lokasi ?? '-',
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          )
-        ],
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Material(
+                color: Colors.black26,
+                shape: const CircleBorder(),
+                child: IconButton(
+                  icon: Icon(
+                    isFavorited ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorited ? Colors.redAccent : Colors.white,
+                  ),
+                  onPressed: () {
+                    if (item.id != null) {
+                      _toggleFavorite(item.id!);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

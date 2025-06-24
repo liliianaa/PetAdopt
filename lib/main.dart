@@ -1,48 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:petadopt/helper/SharedPrefHelper.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadopt/bloc/Auth/AuthBloc.dart';
+import 'package:petadopt/bloc/Auth/AuthEvent.dart';
+import 'package:petadopt/bloc/Auth/AuthState.dart';
+import 'package:petadopt/bloc/Profile/profile_bloc.dart';
+import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/LandingPage.dart';
+import 'package:petadopt/pages/MenuPage/AddHewanPage.dart';
+import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
 import 'package:petadopt/providers/auth_provider.dart';
-import 'package:petadopt/services/auth_services.dart';
-import 'package:provider/provider.dart';
+import 'package:petadopt/providers/hewan_provider.dart';
+import 'package:petadopt/providers/profile_provider.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider(authServices: AuthServices()),
-        ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Authrepostories authrepostories = Authrepostories();
+  final Profilerepositories repositories = Profilerepositories();
+  final Hewanrepositories hewanrepositories = Hewanrepositories();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Pet Adopt',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: FutureBuilder<bool>(
-        future: SharedPrefHelper().isAuth(), // ini cek token
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator(); // atau splash
-          }
-          if (snapshot.hasData && snapshot.data == true) {
-            return const MainPage();
-          } else {
-            return const LandingPage();
-          }
-        },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<Authbloc>(
+          create: (_) => Authbloc(authrepostories: authrepostories)
+            ..add(AuthCheckStatus()),
+        ),
+        BlocProvider<ProfileBloc>(create: (_) => ProfileBloc(repositories)),
+        BlocProvider<HewanBloc>(create: (_) => HewanBloc(hewanrepositories)),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: BlocBuilder<Authbloc, Authstate>(
+          builder: (context, state) {
+            if (state is AuthLoading || state is Authinitial) {
+              return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()));
+            } else if (state is Authautenticated) {
+              return const MainPage();
+            } else {
+              return const LandingPage();
+            }
+          },
+        ),
       ),
     );
   }
