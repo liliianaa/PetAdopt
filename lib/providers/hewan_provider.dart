@@ -280,7 +280,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/user/profile/my-pets'),
+        Uri.parse('$_BaseURL/profile/my-pets'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -307,7 +307,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/user/permohonan/hewan/$id/pemohon'),
+        Uri.parse('$_BaseURL/permohonan/hewan/$id/pemohon'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -334,7 +334,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/user/permohonan/hewan/$id/user/$userid'),
+        Uri.parse('$_BaseURL/permohonan/hewan/$id/user/$userid'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -357,7 +357,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.put(
-        Uri.parse('$_BaseURL/user/permohonan/$pemohonId/status'),
+        Uri.parse('$_BaseURL/permohonan/$pemohonId/status'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -381,7 +381,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/user/permohonan/daftar-permohonan/list-hewan'),
+        Uri.parse('$_BaseURL/permohonan/daftar-permohonan/list-hewan'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -408,7 +408,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.get(
-        Uri.parse('$_BaseURL/user/permohonan/$pemohonid'),
+        Uri.parse('$_BaseURL/permohonan/$pemohonid'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -431,7 +431,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.delete(
-        Uri.parse('$_BaseURL/user/permohonan/$permohonanId'),
+        Uri.parse('$_BaseURL/permohonan/$permohonanId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -454,7 +454,7 @@ class Hewanrepositories {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.put(
-        Uri.parse('$_BaseURL/user/permohonan/$permohonId'),
+        Uri.parse('$_BaseURL/permohonan/$permohonId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
