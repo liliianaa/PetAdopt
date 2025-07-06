@@ -8,7 +8,7 @@ class FavoriteRepository {
   final SharedPrefHelper _tokenManager = SharedPrefHelper();
 
   // Toggle Like / Dislike
-  Future<PostLiked> postLikes(int hewanid, PostLiked postliked) async {
+  Future<PostLiked> postLikes(int hewanid) async {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.post(
@@ -16,42 +16,42 @@ class FavoriteRepository {
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
         },
-        body: postliked.toJson(),
       );
+
       if (response.statusCode == 200) {
-        final jsondata = jsonDecode(response.body);
-        final data = jsondata['data'];
-        return PostLiked.fromJson(data);
+        return PostLiked.fromJson(response.body);
       } else {
         final jsonData = jsonDecode(response.body);
         throw Exception(jsonData['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      throw Exception(e);
+      throw Exception('Error saat mengirim like: $e');
     }
   }
 
-  Future<Datum> getlikes(Datum datalike) async {
+  // Get most favorite pets
+  Future<List<Datum>> getLikes() async {
     try {
       final token = await _tokenManager.getToken();
-      final response =
-          await http.get(Uri.parse('$_baseURL/hewan/favorite'), headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      });
+      final response = await http.get(
+        Uri.parse('$_baseURL/hewan/favorite'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
       if (response.statusCode == 200) {
         final jsondata = jsonDecode(response.body);
-        final data = jsondata['data'];
-        return Datum.fromJson(data);
+        final List<dynamic> data = jsondata['data'];
+        return data.map((item) => Datum.fromMap(item)).toList();
       } else {
         final jsonData = jsonDecode(response.body);
         throw Exception(jsonData['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      throw Exception(e);
+      throw Exception('Error saat mengambil likes: $e');
     }
   }
 }

@@ -3,18 +3,9 @@ part of 'favorite_bloc.dart';
 
 abstract class FavoriteEvent {}
 
-class postFavoriteEvent extends FavoriteEvent {
+class PostFavoriteEvent extends FavoriteEvent {
   final int hewanId;
-  final PostLiked postlike;
-  postFavoriteEvent({
-    required this.hewanId,
-    required this.postlike,
-  });
+  PostFavoriteEvent({required this.hewanId});
 }
 
-class getfavoriteEvent extends FavoriteEvent {
-  final Datum getlike;
-  getfavoriteEvent({
-    required this.getlike,
-  });
-}
+class GetFavoriteEvent extends FavoriteEvent {}

@@ -18,6 +18,9 @@ class _AddHewanPageState extends State<AddHewanPage> {
   final TextEditingController _umurController = TextEditingController();
   final TextEditingController _deskripsiController = TextEditingController();
   final TextEditingController _lokasiController = TextEditingController();
+  
+  bool _isLoadingDialogVisible = false;
+  bool _navigated = false;
 
   String? _selectedKelamin;
   String? _selectedJenis;
@@ -67,10 +70,9 @@ class _AddHewanPageState extends State<AddHewanPage> {
     }
   }
 
-  bool _isLoadingDialogVisible = false;
 
   void _showLoadingDialog() {
-    if (!_isLoadingDialogVisible) {
+    if (!_isLoadingDialogVisible && context.mounted) {
       _isLoadingDialogVisible = true;
       showDialog(
         context: context,
@@ -81,7 +83,7 @@ class _AddHewanPageState extends State<AddHewanPage> {
   }
 
   void _hideLoadingDialog() {
-    if (_isLoadingDialogVisible) {
+    if (_isLoadingDialogVisible && context.mounted) {
       _isLoadingDialogVisible = false;
       Navigator.of(context, rootNavigator: true).pop();
     }
@@ -96,32 +98,37 @@ class _AddHewanPageState extends State<AddHewanPage> {
         elevation: 2,
         centerTitle: true,
       ),
-      body: BlocListener<HewanBloc, HewanState>(
+
+      body:BlocListener<HewanBloc, HewanState>(
         listener: (context, state) {
           print("Listener menerima state: $state");
-          if (state is HewanLoading) {
+
+          if (state is HewanLoading && !_isLoadingDialogVisible && !_navigated) {
             _showLoadingDialog();
-          } else {
+          }
+
+          if (state is HewanSuccess && !_navigated) {
+            _navigated = true;
             _hideLoadingDialog();
 
-            if (state is HewanSuccess) {
-              print("Listener: HewanSuccess terdeteksi, navigasi!");
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Added successfully")),
-              );
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Added successfully")),
+            );
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const KatalogPage()),
-              );
-            } else if (state is HewanError) {
-              print("Pesan error: ${state.message}");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const KatalogPage()),
+            );
+          }
+
+          if (state is HewanError) {
+            _hideLoadingDialog();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
           }
         },
+
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Form(
