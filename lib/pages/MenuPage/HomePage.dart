@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:petadopt/bloc/favorite/favorite_bloc.dart';
+import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
 import 'package:petadopt/model/Like_response.dart';
+import 'package:petadopt/pages/MenuPage/DeskripsiHewanPage.dart';
 import 'package:petadopt/pages/MenuPage/FavoritePetPage.dart';
 import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
 
@@ -170,100 +172,122 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHewanCardFromAPI(Datum item) {
-    return Container(
-      width: 140,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: CachedNetworkImage(
-                  imageUrl: item.image ?? '',
-                  height: 100,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) =>
-                      const Icon(Icons.error, size: 40, color: Colors.red),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: () {
-                    if (item.id != null) {
-                      BlocProvider.of<FavoriteBloc>(context)
-                          .add(PostFavoriteEvent(hewanId: item.id!));
-                    }
-                  },
-                ),
-              ),
-              Positioned(
-                bottom: 8,
-                right: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'Favorit',
-                    style: TextStyle(fontSize: 10, color: Colors.black87),
-                  ),
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+    return GestureDetector(
+      onTap: () {
+        if (item.id != null) {
+          context.read<HewanBloc>().add(GetHewanByIdEvent(id: item.id!));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DeskripsiHewanPage(id: item.id!),
+            ),
+          ).then((_) {
+            context.read<FavoriteBloc>().add(GetFavoriteEvent());
+            context.read<HewanBloc>().add(GetHewanEvent());
+          });
+        }
+      },
+      child: Container(
+        width: 140,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        ),
+        child: Column(
+          children: [
+            Stack(
               children: [
-                Text(
-                  item.nama ?? '-',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.status?.name.toUpperCase() ?? '-',
-                  style: TextStyle(
-                    color: item.status == Status.TERSEDIA
-                        ? Colors.green
-                        : Colors.red,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: CachedNetworkImage(
+                    imageUrl: (item.image != null && item.image!.isNotEmpty)
+                        ? item.image!
+                        : 'https://via.placeholder.com/140x100.png?text=No+Image',
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error, size: 40, color: Colors.red),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.favorite, size: 14, color: Colors.red),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${item.likesCount ?? 0} suka',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (item.id != null) {
+                        BlocProvider.of<FavoriteBloc>(context)
+                            .add(PostFavoriteEvent(hewanId: item.id!));
+                      }
+                    },
+                    child: const SizedBox(
+                      width: 28,
+                      height: 28,
                     ),
-                  ],
+                  ),
                 ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'Favorit',
+                      style: TextStyle(fontSize: 10, color: Colors.black87),
+                    ),
+                  ),
+                )
               ],
             ),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    item.nama ?? '-',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.status?.name.toUpperCase() ?? '-',
+                    style: TextStyle(
+                      color: item.status == Status.TERSEDIA
+                          ? Colors.green
+                          : Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.favorite, size: 14, color: Colors.red),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${item.likesCount ?? 0} suka',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

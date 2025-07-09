@@ -19,7 +19,7 @@ class _AddHewanPageState extends State<AddHewanPage> {
   final TextEditingController _umurController = TextEditingController();
   final TextEditingController _deskripsiController = TextEditingController();
   final TextEditingController _lokasiController = TextEditingController();
-  
+
   bool _isLoadingDialogVisible = false;
   bool _navigated = false;
 
@@ -71,7 +71,6 @@ class _AddHewanPageState extends State<AddHewanPage> {
     }
   }
 
-
   void _showLoadingDialog() {
     if (!_isLoadingDialogVisible && context.mounted) {
       _isLoadingDialogVisible = true;
@@ -94,17 +93,33 @@ class _AddHewanPageState extends State<AddHewanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tambah Hewan"),
+        title: const Text(
+          "Tambah Hewan",
+          style: TextStyle(color: Colors.white), // Judul putih
+        ),
         backgroundColor: ColorConfig.mainbabyblue,
         elevation: 2,
         centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Back icon putih
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const KatalogPage()),
+            );
+          },
+        ),
       ),
-
-      body:BlocListener<HewanBloc, HewanState>(
+      body: BlocListener<HewanBloc, HewanState>(
         listener: (context, state) {
           print("Listener menerima state: $state");
 
-          if (state is HewanLoading && !_isLoadingDialogVisible && !_navigated) {
+          if (state is HewanLoading &&
+              !_isLoadingDialogVisible &&
+              !_navigated) {
             _showLoadingDialog();
           }
 
@@ -129,7 +144,6 @@ class _AddHewanPageState extends State<AddHewanPage> {
             );
           }
         },
-
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Form(
