@@ -38,7 +38,6 @@ class _KatalogPageState extends State<KatalogPage> {
       _getHewanByJenis(widget.jenis ?? 'semua');
     }
     _loadFavorites();
-    context.read<FavoriteBloc>().add(GetFavoriteEvent());
     context
         .read<FavoriteBloc>()
         .add(GetFavoriteEvent()); // untuk isi favoriteIds
@@ -65,10 +64,21 @@ class _KatalogPageState extends State<KatalogPage> {
   }
 
   void _toggleFavorite(int id) {
+    if (id == null) return; // validasi ekstra
+
     final bool isLiked = favoriteIds.contains(id);
-    context.read<FavoriteBloc>().add(
-          PostFavoriteEvent(hewanId: id),
-        );
+
+    // Update lokal DULU supaya UI langsung berubah
+    setState(() {
+      if (isLiked) {
+        favoriteIds.remove(id);
+      } else {
+        favoriteIds.add(id);
+      }
+    });
+
+    // Kirim ke server
+    context.read<FavoriteBloc>().add(PostFavoriteEvent(hewanId: id));
   }
 
   void _onSelectJenis(String jenis) {
@@ -163,14 +173,16 @@ class _KatalogPageState extends State<KatalogPage> {
           final id = state.hewanId;
           final isLiked = state.postLiked.liked ?? false;
 
+          // Sinkron ulang jika backend punya state berbeda
           setState(() {
             if (isLiked) {
-              favoriteIds.add(id);
+              favoriteIds.add(id); // pastikan tetap merah
             } else {
-              favoriteIds.remove(id);
+              favoriteIds.remove(id); // pastikan jadi putih
             }
           });
         }
+
         if (state is GetFavoriteSuccess) {
           setState(() {
             favoriteIds = state.favoriteIds;
@@ -347,8 +359,10 @@ class _KatalogPageState extends State<KatalogPage> {
                     color: isFavorited ? Colors.redAccent : Colors.white,
                   ),
                   onPressed: () {
-                    _toggleFavorite(item.id!);
-                  },
+                    if (item.id != null) {
+                      _toggleFavorite(item.id!);
+                    }
+                  },  
                 ),
               ),
             ),

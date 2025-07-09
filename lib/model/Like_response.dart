@@ -71,6 +71,7 @@ class Datum {
   String toJson() => json.encode(toMap());
 
   factory Datum.fromMap(Map<String, dynamic> json) => Datum(
+        id: json["id"],
         image: json["image"],
         nama: json["nama"],
         status: statusValues.map[json["status"]],
@@ -78,6 +79,7 @@ class Datum {
       );
 
   Map<String, dynamic> toMap() => {
+        "id": id,
         "image": image,
         "nama": nama,
         "status": statusValues.reverse[status],

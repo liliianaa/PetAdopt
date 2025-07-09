@@ -19,6 +19,9 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
           postLiked: likedpost,
           hewanId: event.hewanId,
         ));
+
+        add(GetFavoriteEvent());
+        
       } catch (e) {
         emit(FavoriteError(message: e.toString()));
       }
@@ -28,10 +31,15 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
       emit(FavoriteLoading());
       try {
         final likedData = await favoriteRepository.getLikes();
-        final likedIds =
-            likedData.map((item) => item.id!).toSet(); // Pastikan id ada
-        emit(
-            GetFavoriteSuccess(getLikedList: likedData, favoriteIds: likedIds));
+        final likedIds = likedData
+            .map((item) => item.id) // item.id bisa null
+            .whereType<int>() // hanya ambil yang tidak null
+            .toSet(); // hasilnya Set<int>
+
+        emit(GetFavoriteSuccess(
+          getLikedList: likedData,
+          favoriteIds: likedIds,
+        ));
       } catch (e) {
         emit(FavoriteError(message: e.toString()));
       }

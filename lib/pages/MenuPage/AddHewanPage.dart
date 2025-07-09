@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
+import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
 
 class AddHewanPage extends StatefulWidget {
@@ -94,7 +95,7 @@ class _AddHewanPageState extends State<AddHewanPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tambah Hewan"),
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: ColorConfig.mainbabyblue,
         elevation: 2,
         centerTitle: true,
       ),

@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Hewan Favorit anda',
+        const Text('Hewan Favorite Anda',
             style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         BlocBuilder<FavoriteBloc, FavoriteState>(
@@ -205,7 +205,6 @@ class _HomePageState extends State<HomePage> {
                           .add(PostFavoriteEvent(hewanId: item.id!));
                     }
                   },
-                  child: const Icon(Icons.favorite, color: Colors.red),
                 ),
               ),
               Positioned(
@@ -246,6 +245,20 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.favorite, size: 14, color: Colors.red),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${item.likesCount ?? 0} suka',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
