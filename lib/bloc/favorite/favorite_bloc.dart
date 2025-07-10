@@ -11,21 +11,35 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
   FavoriteBloc(
     this.favoriteRepository,
   ) : super(FavoriteInitial()) {
-    on<postFavoriteEvent>((event, emit) async {
+    on<PostFavoriteEvent>((event, emit) async {
       emit(FavoriteLoading());
       try {
-        final likedpost =
-            await favoriteRepository.postLikes(event.hewanId, event.postlike);
-        emit(FavoriteSuccess(Postliked: likedpost));
+        final likedpost = await favoriteRepository.postLikes(event.hewanId);
+        emit(FavoriteSuccess(
+          postLiked: likedpost,
+          hewanId: event.hewanId,
+        ));
+
+        add(GetFavoriteEvent());
+        
       } catch (e) {
         emit(FavoriteError(message: e.toString()));
       }
     });
-    on<getfavoriteEvent>((event, emit) async {
+
+    on<GetFavoriteEvent>((event, emit) async {
       emit(FavoriteLoading());
       try {
-        final likedget = await favoriteRepository.getlikes(event.getlike);
-        emit(getFavoriteSuccess(getliked: likedget));
+        final likedData = await favoriteRepository.getLikes();
+        final likedIds = likedData
+            .map((item) => item.id) // item.id bisa null
+            .whereType<int>() // hanya ambil yang tidak null
+            .toSet(); // hasilnya Set<int>
+
+        emit(GetFavoriteSuccess(
+          getLikedList: likedData,
+          favoriteIds: likedIds,
+        ));
       } catch (e) {
         emit(FavoriteError(message: e.toString()));
       }

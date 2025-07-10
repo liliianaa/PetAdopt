@@ -1,12 +1,30 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadopt/bloc/favorite/favorite_bloc.dart';
+import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
+import 'package:petadopt/model/Like_response.dart';
+import 'package:petadopt/pages/MenuPage/DeskripsiHewanPage.dart';
 import 'package:petadopt/pages/MenuPage/FavoritePetPage.dart';
 import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key, this.token, this.message}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key, this.token, this.message, this.onJenisSelected})
+      : super(key: key);
   final String? token;
   final String? message;
+  final Function(String)? onJenisSelected;
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<FavoriteBloc>().add(GetFavoriteEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +57,10 @@ class HomePage extends StatelessWidget {
       children: [
         Image.asset('assets/logo.png', height: 60),
         Row(
-          children: [
-            const Icon(Icons.notifications_none),
-            const SizedBox(width: 12),
-            const Icon(Icons.message_outlined),
+          children: const [
+            Icon(Icons.notifications_none),
+            SizedBox(width: 12),
+            Icon(Icons.message_outlined),
           ],
         ),
       ],
@@ -84,11 +102,10 @@ class HomePage extends StatelessWidget {
   Widget _buildKategoriIcon(String img, String label, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigasi ke KatalogPage dengan kategori label
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => KatalogPage(),
+            builder: (context) => KatalogPage(jenis: label.toLowerCase()),
           ),
         );
       },
@@ -114,112 +131,163 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildHewanFavorit() {
-    final favoritData = [
-      {
-        'img': 'assets/kucing2.jpeg',
-        'nama': 'Kucing Persia',
-        'lokasi': 'Semarang',
-      },
-      {
-        'img': 'assets/anjing3.jpeg',
-        'nama': 'Kucing Oren',
-        'lokasi': 'Bandung',
-      },
-      {
-        'img': 'assets/kucing4.jpeg',
-        'nama': 'Kucing Anggora',
-        'lokasi': 'Jakarta',
-      },
-      {
-        'img': 'assets/kucing5.jpeg',
-        'nama': 'Kucing Anggora',
-        'lokasi': 'Jakarta',
-      },
-      {
-        'img': 'assets/anjing4.jpeg',
-        'nama': 'Kucing Anggora',
-        'lokasi': 'Jakarta',
-      },
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Hewan Favorit anda',
+        const Text('Hewan Favorite Anda',
             style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 180,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: favoritData.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final item = favoritData[index];
-              return _buildHewanCard(
-                  item['img']!, item['nama']!, item['lokasi']!);
-            },
-          ),
-        )
+        BlocBuilder<FavoriteBloc, FavoriteState>(
+          builder: (context, state) {
+            if (state is FavoriteLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is GetFavoriteSuccess) {
+              final favoriteList = state.getLikedList;
+
+              if (favoriteList.isEmpty) {
+                return const Text("Belum ada hewan favorit.");
+              }
+
+              return SizedBox(
+                height: 180,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: favoriteList.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final item = favoriteList[index];
+                    return _buildHewanCardFromAPI(item);
+                  },
+                ),
+              );
+            } else if (state is FavoriteError) {
+              return Text("Gagal memuat favorit: ${state.message}");
+            } else {
+              return const SizedBox();
+            }
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildHewanCard(String imgPath, String nama, String lokasi) {
-    return Container(
-      width: 140,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.asset(imgPath,
-                    height: 100, width: double.infinity, fit: BoxFit.cover),
-              ),
-              const Positioned(
-                top: 8,
-                right: 8,
-                child: Icon(Icons.favorite, color: Colors.red),
-              ),
-              Positioned(
-                bottom: 8,
-                right: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text('Sold out', style: TextStyle(fontSize: 10)),
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+  Widget _buildHewanCardFromAPI(Datum item) {
+    return GestureDetector(
+      onTap: () {
+        if (item.id != null) {
+          context.read<HewanBloc>().add(GetHewanByIdEvent(id: item.id!));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DeskripsiHewanPage(id: item.id!),
+            ),
+          ).then((_) {
+            context.read<FavoriteBloc>().add(GetFavoriteEvent());
+            context.read<HewanBloc>().add(GetHewanEvent());
+          });
+        }
+      },
+      child: Container(
+        width: 140,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        ),
+        child: Column(
+          children: [
+            Stack(
               children: [
-                Text(nama, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.location_on, size: 12),
-                    const SizedBox(width: 4),
-                    Text(lokasi, style: const TextStyle(fontSize: 12)),
-                  ],
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: CachedNetworkImage(
+                    imageUrl: (item.image != null && item.image!.isNotEmpty)
+                        ? item.image!
+                        : 'https://via.placeholder.com/140x100.png?text=No+Image',
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error, size: 40, color: Colors.red),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (item.id != null) {
+                        BlocProvider.of<FavoriteBloc>(context)
+                            .add(PostFavoriteEvent(hewanId: item.id!));
+                      }
+                    },
+                    child: const SizedBox(
+                      width: 28,
+                      height: 28,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'Favorit',
+                      style: TextStyle(fontSize: 10, color: Colors.black87),
+                    ),
+                  ),
                 )
               ],
             ),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    item.nama ?? '-',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.status?.name.toUpperCase() ?? '-',
+                    style: TextStyle(
+                      color: item.status == Status.TERSEDIA
+                          ? Colors.green
+                          : Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.favorite, size: 14, color: Colors.red),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${item.likesCount ?? 0} suka',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

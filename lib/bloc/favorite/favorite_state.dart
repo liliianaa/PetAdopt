@@ -9,15 +9,20 @@ final class FavoriteInitial extends FavoriteState {}
 final class FavoriteLoading extends FavoriteState {}
 
 final class FavoriteSuccess extends FavoriteState {
-  final PostLiked Postliked;
+  final PostLiked postLiked;
+  final int hewanId;
 
-  FavoriteSuccess({required this.Postliked});
+  FavoriteSuccess({required this.postLiked, required this.hewanId});
 }
 
-final class getFavoriteSuccess extends FavoriteState {
-  final Datum getliked;
+final class GetFavoriteSuccess extends FavoriteState {
+  final List<Datum> getLikedList;
+  final Set<int> favoriteIds;
 
-  getFavoriteSuccess({required this.getliked});
+  GetFavoriteSuccess({
+    required this.getLikedList,
+    required this.favoriteIds,
+  });
 }
 
 final class FavoriteError extends FavoriteState {

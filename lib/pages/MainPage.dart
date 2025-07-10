@@ -8,7 +8,8 @@ import 'package:petadopt/pages/MenuPage/KomunitasPage.dart';
 import 'package:petadopt/pages/MenuPage/ProfilePage.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final String? jenisAwal;
+  const MainPage({super.key, this.jenisAwal});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -21,8 +22,7 @@ class _MainPageState extends State<MainPage>
   late AnimationController _controller;
   late Animation<double> _animation;
 
-  String? token;
-  String? message;
+  late List<Widget> _pages;
 
   @override
   void initState() {
@@ -37,7 +37,18 @@ class _MainPageState extends State<MainPage>
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
 
-    _loadUserData();
+    _pages = [
+      HomePage(onJenisSelected: _handleJenisSelected),
+      KatalogPage(jenis: widget.jenisAwal ?? 'semua'),
+      const Profilepage(),
+    ];
+  }
+
+  void _handleJenisSelected(String jenis) {
+    setState(() {
+      _selectedIndex = 1;
+      _pages[1] = KatalogPage(jenis: jenis);
+    });
   }
 
   @override
@@ -46,22 +57,34 @@ class _MainPageState extends State<MainPage>
     super.dispose();
   }
 
-  Future<void> _loadUserData() async {
-    final prefsHelper = SharedPrefHelper();
-    final savedToken = await prefsHelper.getToken();
-    final savedMessage = await prefsHelper.getMessage();
-
-    setState(() {
-      token = savedToken;
-      message = savedMessage;
-    });
-  }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
     _controller.forward(from: 0.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: ColorConfig.mainblue,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          _buildNavItem(Icons.home, 'Home', 0),
+          _buildNavItem(Icons.grid_view, 'Katalog', 1),
+          _buildNavItem(Icons.person, 'Profil', 2),
+        ],
+      ),
+    );
   }
 
   BottomNavigationBarItem _buildNavItem(
@@ -82,42 +105,6 @@ class _MainPageState extends State<MainPage>
         },
       ),
       label: label,
-    );
-  }
-
-  Widget _getPage(int index) {
-    switch (index) {
-      case 0:
-        return HomePage();
-      case 1:
-        return const KatalogPage();
-      // case 2:
-      //   return const KomunitasPage();
-      case 2:
-        return const Profilepage();
-      default:
-        return HomePage();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _getPage(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: ColorConfig.mainblue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          _buildNavItem(Icons.home, 'Home', 0),
-          _buildNavItem(Icons.grid_view, 'Katalog', 1),
-          // _buildNavItem(Icons.group_add_outlined, 'Komunitas', 2),
-          _buildNavItem(Icons.person, 'Profil', 2),
-        ],
-      ),
     );
   }
 }

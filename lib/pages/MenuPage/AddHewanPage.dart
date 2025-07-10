@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
+import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
 
 class AddHewanPage extends StatefulWidget {
@@ -18,6 +19,9 @@ class _AddHewanPageState extends State<AddHewanPage> {
   final TextEditingController _umurController = TextEditingController();
   final TextEditingController _deskripsiController = TextEditingController();
   final TextEditingController _lokasiController = TextEditingController();
+
+  bool _isLoadingDialogVisible = false;
+  bool _navigated = false;
 
   String? _selectedKelamin;
   String? _selectedJenis;
@@ -67,10 +71,8 @@ class _AddHewanPageState extends State<AddHewanPage> {
     }
   }
 
-  bool _isLoadingDialogVisible = false;
-
   void _showLoadingDialog() {
-    if (!_isLoadingDialogVisible) {
+    if (!_isLoadingDialogVisible && context.mounted) {
       _isLoadingDialogVisible = true;
       showDialog(
         context: context,
@@ -81,7 +83,7 @@ class _AddHewanPageState extends State<AddHewanPage> {
   }
 
   void _hideLoadingDialog() {
-    if (_isLoadingDialogVisible) {
+    if (_isLoadingDialogVisible && context.mounted) {
       _isLoadingDialogVisible = false;
       Navigator.of(context, rootNavigator: true).pop();
     }
@@ -91,35 +93,55 @@ class _AddHewanPageState extends State<AddHewanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tambah Hewan"),
-        backgroundColor: Colors.blue.shade700,
+        title: const Text(
+          "Tambah Hewan",
+          style: TextStyle(color: Colors.white), // Judul putih
+        ),
+        backgroundColor: ColorConfig.mainbabyblue,
         elevation: 2,
         centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Back icon putih
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const KatalogPage()),
+            );
+          },
+        ),
       ),
       body: BlocListener<HewanBloc, HewanState>(
         listener: (context, state) {
           print("Listener menerima state: $state");
-          if (state is HewanLoading) {
+
+          if (state is HewanLoading &&
+              !_isLoadingDialogVisible &&
+              !_navigated) {
             _showLoadingDialog();
-          } else {
+          }
+
+          if (state is HewanSuccess && !_navigated) {
+            _navigated = true;
             _hideLoadingDialog();
 
-            if (state is HewanSuccess) {
-              print("Listener: HewanSuccess terdeteksi, navigasi!");
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Added successfully")),
-              );
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Added successfully")),
+            );
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const KatalogPage()),
-              );
-            } else if (state is HewanError) {
-              print("Pesan error: ${state.message}");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const KatalogPage()),
+            );
+          }
+
+          if (state is HewanError) {
+            _hideLoadingDialog();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
           }
         },
         child: SingleChildScrollView(

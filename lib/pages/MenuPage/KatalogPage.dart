@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
+// Import dengan prefix alias untuk menghindari konflik nama class Datum
+import 'package:petadopt/model/Like_response.dart' as like_response;
+import 'package:petadopt/model/hewan_respon_model.dart' as hewan_response;
+
+import 'package:petadopt/bloc/favorite/favorite_bloc.dart';
 import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
 import 'package:petadopt/config/ColorConfig.dart';
-import 'package:petadopt/model/hewan_respon_model.dart';
+import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/MenuPage/AddHewanPage.dart';
 import 'package:petadopt/pages/MenuPage/DeskripsiHewanPage.dart';
 
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
+  }
+}
+
 class KatalogPage extends StatefulWidget {
-  const KatalogPage({super.key});
+  final String? jenis;
+  final bool refresh;
+  const KatalogPage({super.key, this.jenis, this.refresh = true});
 
   @override
   State<KatalogPage> createState() => _KatalogPageState();
@@ -16,19 +31,32 @@ class KatalogPage extends StatefulWidget {
 
 class _KatalogPageState extends State<KatalogPage> {
   String selectedJenis = 'Semua';
-  Set<int> favoriteIds = {};
+
+  /// favoriteIds nullable, baru akan di-set setelah data favorit didapat
+  Set<int>? favoriteIds;
+
+  bool _shouldShowLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _getHewanByJenis("semua");
+    selectedJenis = widget.jenis?.capitalize() ?? 'Semua';
+
+    // Fetch favorit dan data hewan sesuai jenis
+    context.read<FavoriteBloc>().add(GetFavoriteEvent());
+
+    if (selectedJenis.toLowerCase() == 'semua') {
+      context.read<HewanBloc>().add(GetHewanEvent());
+    } else {
+      context
+          .read<HewanBloc>()
+          .add(GetHewanByJenisEvent(jenis: selectedJenis.toLowerCase()));
+    }
   }
 
   void _getHewanByJenis(String jenis) {
     if (jenis.toLowerCase() == 'semua') {
-      context
-          .read<HewanBloc>()
-          .add(GetHewanEvent()); // event untuk ambil semua hewan
+      context.read<HewanBloc>().add(GetHewanEvent());
     } else {
       context
           .read<HewanBloc>()
@@ -37,15 +65,15 @@ class _KatalogPageState extends State<KatalogPage> {
   }
 
   void _toggleFavorite(int id) {
-    setState(() {
-      favoriteIds.contains(id) ? favoriteIds.remove(id) : favoriteIds.add(id);
-    });
+    context.read<FavoriteBloc>().add(PostFavoriteEvent(hewanId: id));
   }
 
   void _onSelectJenis(String jenis) {
     setState(() {
       selectedJenis = jenis;
-      _getHewanByJenis(jenis);
+      favoriteIds = null; // reset favoriteIds supaya loading lagi
+      _getHewanByJenis(jenis.toLowerCase());
+      context.read<FavoriteBloc>().add(GetFavoriteEvent());
     });
   }
 
@@ -53,6 +81,15 @@ class _KatalogPageState extends State<KatalogPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MainPage()),
+            );
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
         title: const Text("Katalog Hewan"),
         backgroundColor: ColorConfig.mainbabyblue,
         centerTitle: true,
@@ -68,8 +105,17 @@ class _KatalogPageState extends State<KatalogPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (_) => AddHewanPage())),
+        onPressed: () {
+          _shouldShowLoading = false;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => AddHewanPage()),
+          ).then((_) {
+            _shouldShowLoading = true;
+            _getHewanByJenis(selectedJenis);
+            context.read<FavoriteBloc>().add(GetFavoriteEvent());
+          });
+        },
         child: const Icon(Icons.add),
       ),
     );
@@ -96,54 +142,78 @@ class _KatalogPageState extends State<KatalogPage> {
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: jenisList
-              .map((jenis) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: _hewanSelector(jenis['label']!, jenis['icon']!),
-                  ))
-              .toList(),
+          children: jenisList.map((jenis) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: _hewanSelector(jenis['label']!, jenis['icon']!),
+            );
+          }).toList(),
         ),
       ),
     );
   }
 
   Widget _buildHewanList() {
-    return BlocBuilder<HewanBloc, HewanState>(
-      builder: (context, state) {
-        if (state is HewanLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is HewanSuccess) {
-          final data = state.hewandata;
-          if (data.isEmpty) {
-            return const Center(child: Text("Tidak ada data"));
-          }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<FavoriteBloc, FavoriteState>(
+          listener: (context, state) {
+            if (state is FavoriteSuccess) {
+              final hewanId = state.hewanId;
+              // Update lokal agar langsung kelihatan di UI
+              setState(() {
+                if (favoriteIds != null) {
+                  if (favoriteIds!.contains(hewanId)) {
+                    favoriteIds!.remove(hewanId);
+                  } else {
+                    favoriteIds!.add(hewanId);
+                  }
+                }
+              });
+            } else if (state is GetFavoriteSuccess) {
+              setState(() {
+                favoriteIds = state.favoriteIds;
+              });
+              print('GetFavoriteSuccess: favoriteIds=${state.favoriteIds}');
+            }
+          },
+        ),
+      ],
+      child: BlocBuilder<HewanBloc, HewanState>(
+        builder: (context, state) {
+          if (state is HewanLoading || favoriteIds == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is HewanSuccess) {
+            final data = state.hewandata;
 
-          return GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 18,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              final item = data[index];
-              final isFavorited = favoriteIds.contains(item.id);
-              return _hewanCard(item, isFavorited);
-            },
-          );
-        } else if (state is HewanError) {
-          return Center(
-            child: Text(
-              state.message ?? "Terjadi kesalahan",
-              style: const TextStyle(color: Colors.red, fontSize: 16),
-            ),
-          );
-        } else {
-          return const SizedBox();
-        }
-      },
+            if (data.isEmpty) {
+              return const Center(child: Text("Tidak ada data"));
+            }
+
+            return GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 18,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.7,
+              ),
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final item = data[index];
+                final isFavorited =
+                    item.id != null && favoriteIds!.contains(item.id!);
+
+                return _hewanCard(item, isFavorited);
+              },
+            );
+          } else if (state is HewanError) {
+            return Center(child: Text(state.message ?? "Terjadi kesalahan"));
+          } else {
+            return const SizedBox();
+          }
+        },
+      ),
     );
   }
 
@@ -162,10 +232,9 @@ class _KatalogPageState extends State<KatalogPage> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.blue.withOpacity(0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  )
+                      color: Colors.blue.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4))
                 ]
               : [],
         ),
@@ -173,9 +242,8 @@ class _KatalogPageState extends State<KatalogPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ClipOval(
-              child: Image.network(imageUrl,
-                  width: 40, height: 40, fit: BoxFit.cover),
-            ),
+                child: Image.network(imageUrl,
+                    width: 40, height: 40, fit: BoxFit.cover)),
             const SizedBox(height: 6),
             Text(
               jenis,
@@ -191,19 +259,19 @@ class _KatalogPageState extends State<KatalogPage> {
     );
   }
 
-  Widget _hewanCard(Datum item, bool isFavorited) {
+  Widget _hewanCard(hewan_response.Datum item, bool isFavorited) {
     return GestureDetector(
       onTap: () {
         if (item.id != null) {
           context.read<HewanBloc>().add(GetHewanByIdEvent(id: item.id!));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => DeskripsiHewanPage(id: item.id!)),
+          ).then((_) {
+            _getHewanByJenis(selectedJenis);
+            context.read<FavoriteBloc>().add(GetFavoriteEvent());
+          });
         }
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => DeskripsiHewanPage(id: item.id!)),
-        ).then((_) {
-          _getHewanByJenis(
-              selectedJenis); // reload data sesuai kategori terpilih
-        });
       },
       child: Card(
         elevation: 4,
@@ -233,10 +301,9 @@ class _KatalogPageState extends State<KatalogPage> {
                       Text(
                         item.nama ?? '-',
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black87),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -257,11 +324,9 @@ class _KatalogPageState extends State<KatalogPage> {
                           const Icon(Icons.location_on,
                               size: 14, color: Colors.grey),
                           const SizedBox(width: 4),
-                          Text(
-                            item.lokasi ?? '-',
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey),
-                          ),
+                          Text(item.lokasi ?? '-',
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
                         ],
                       ),
                     ],

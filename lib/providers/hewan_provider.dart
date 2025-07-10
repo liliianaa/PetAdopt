@@ -26,18 +26,15 @@ class Hewanrepositories {
     File? imageFile,
   }) async {
     try {
-      //token
       final token = await _tokenManager.getToken();
       final uri = Uri.parse('$_BaseURL/hewan');
       final request = http.MultipartRequest('POST', uri);
 
-      // Header authorization dan content type
       request.headers.addAll({
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
       });
-      //axshaxha
-      // Fields data form
+
       request.fields.addAll({
         'nama': nama,
         'jenis_kelamin': jenis_kelamin,
@@ -49,7 +46,6 @@ class Hewanrepositories {
         'deskripsi': deskripsi,
       });
 
-      // Jika ada gambar, tambahkan file multipart
       if (imageFile != null) {
         final multipartFile = await http.MultipartFile.fromPath(
           'image',
@@ -58,33 +54,47 @@ class Hewanrepositories {
         request.files.add(multipartFile);
       }
 
-      // Kirim request
       final response = await request.send();
-
-      // Baca response sebagai string
       final responseString = await response.stream.bytesToString();
 
       if (responseString.isEmpty) {
         return Left('Server tidak memberikan response.');
       }
 
-      // Decode JSON
       final jsonResponse = jsonDecode(responseString);
 
-      // Cek status code sukses (200 atau 201)
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonResponse['data'];
-        if (data == null || data is! Map<String, dynamic>) {
-          return Left(
-              jsonResponse['message'] ?? 'Data hewan tidak valid dari server.');
+
+        // ✅ Jika data tersedia dan valid
+        if (data != null && data is Map<String, dynamic>) {
+          final datum = Datum.fromJson(data);
+          return Right(datum);
         }
-        final datum = Datum.fromJson(data);
-        return Right(datum);
+
+        // ✅ Jika data kosong tapi pesan success
+        final message = jsonResponse['message']?.toString().toLowerCase() ?? '';
+        if (message.contains('success')) {
+          final fallbackDatum = Datum(
+            nama: nama,
+            jenisKelamin: jenis_kelamin,
+            warna: warna,
+            jenisHewan: jenis_hewan,
+            umur: int.tryParse(umur),
+            status: status,
+            lokasi: lokasi,
+            deskripsi: deskripsi,
+            image: imageFile?.path,
+          );
+          return Right(fallbackDatum);
+        }
+
+        return Left(
+            jsonResponse['message'] ?? 'Data hewan tidak valid dari server.');
       } else {
         return Left(jsonResponse['message'] ?? 'Gagal menambahkan hewan');
       }
     } catch (e) {
-      // Tangkap error apapun dan return Left dengan pesan error
       return Left('Terjadi kesalahan: ${e.toString()}');
     }
   }
@@ -171,7 +181,7 @@ class Hewanrepositories {
   Future<Either<String, List<Datum>>> getHewanByJenis(String jenis) async {
     try {
       final token = await _tokenManager.getToken();
-      final url = '$_BaseURL/jenis/$jenis';
+      final url = '$_BaseURL/hewan/jenis/$jenis';
 
       final response = await http.get(
         Uri.parse(url),

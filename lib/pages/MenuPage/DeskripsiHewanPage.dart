@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
 import 'package:petadopt/config/ColorConfig.dart';
 import 'package:petadopt/model/hewan_respon_model.dart';
+import 'package:petadopt/pages/MenuPage/AdopsiFormPage.dart';
 import 'package:petadopt/providers/hewan_provider.dart';
 
 class DeskripsiHewanPage extends StatelessWidget {
@@ -67,7 +68,7 @@ class DeskripsiHewanPageView extends StatelessWidget {
                   const SizedBox(height: 30),
                   _buildOwnerCard(data),
                   const SizedBox(height: 30),
-                  _buildAdoptButton(context),
+                  _buildAdoptButton(context, data),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -242,7 +243,7 @@ class DeskripsiHewanPageView extends StatelessWidget {
     );
   }
 
-  Widget _buildAdoptButton(BuildContext context) {
+  Widget _buildAdoptButton(BuildContext context, Datum data) {
     return SizedBox(
       width: double.infinity,
       child: Material(
@@ -252,9 +253,18 @@ class DeskripsiHewanPageView extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Fitur adopsi belum tersedia")),
-            );
+            if (data.status?.toLowerCase() == 'tersedia') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AdopsiFormPage(hewanId: data.id!),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Fitur adopsi belum tersedia")),
+              );
+            }
           },
           child: const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),

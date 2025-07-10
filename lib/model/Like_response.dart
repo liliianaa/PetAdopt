@@ -52,12 +52,14 @@ class GetLiked {
 }
 
 class Datum {
+  final int? id;
   final String? image;
   final String? nama;
   final Status? status;
   final int? likesCount;
 
   Datum({
+    this.id,
     this.image,
     this.nama,
     this.status,
@@ -69,13 +71,15 @@ class Datum {
   String toJson() => json.encode(toMap());
 
   factory Datum.fromMap(Map<String, dynamic> json) => Datum(
+        id: json["id"],
         image: json["image"],
         nama: json["nama"],
-        status: statusValues.map[json["status"]]!,
+        status: statusValues.map[json["status"]],
         likesCount: json["likes_count"],
       );
 
   Map<String, dynamic> toMap() => {
+        "id": id,
         "image": image,
         "nama": nama,
         "status": statusValues.reverse[status],
