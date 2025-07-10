@@ -22,7 +22,9 @@ class Authrepostories {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final token = json['data']['token'];
+        final role = json['data']['role'];
         await _tokenManager.saveToken(token);
+        await _tokenManager.saveRole(role);
         return {'success': true, 'token': token};
       } else {
         // Ambil pesan error dari response Laravel
@@ -72,5 +74,9 @@ class Authrepostories {
   //mendapatkan token
   Future<String?> getToken() async {
     return await _tokenManager.getToken();
+  }
+
+  Future<String?> getUserRole() async {
+    return await _tokenManager.getRole(); 
   }
 }

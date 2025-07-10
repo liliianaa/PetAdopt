@@ -4,6 +4,8 @@ import 'package:petadopt/bloc/Auth/AuthBloc.dart';
 import 'package:petadopt/bloc/Auth/AuthEvent.dart';
 import 'package:petadopt/bloc/Auth/AuthState.dart';
 import 'package:petadopt/config/ColorConfig.dart';
+import 'package:petadopt/pages/AdminPage/AdminDashboardPage.dart';
+import 'package:petadopt/pages/AdminPage/NavbarAdmin.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/RegisterPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -57,18 +59,42 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _navigateAfterLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final role = prefs.getString('role') ?? 'user'; // default 'user'
+    if (role == 'admin') {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const AdminDashboard()));
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: BlocConsumer<Authbloc, Authstate>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is Authautenticated) {
             _saveCredentials(_rememberMe);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainPage()),
-            );
+            _navigateAfterLogin();
+            final prefs = await SharedPreferences.getInstance();
+            final role = prefs.getString('role') ?? 'user';
+            if (role == 'admin') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminMainPage()),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MainPage()),
+              );
+            }
           } else if (state is Authunautenticated && state.message != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message!)),
@@ -103,8 +129,9 @@ class _LoginPageState extends State<LoginPage> {
                         prefixIcon: const Icon(Icons.email_outlined),
                         border: const OutlineInputBorder(),
                       ),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? 'Email wajib diisi' : null,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Email wajib diisi'
+                          : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -206,7 +233,8 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const RegisterPage(isAdd: true)),
+                              builder: (context) =>
+                                  const RegisterPage(isAdd: true)),
                         );
                       },
                       child: const Text.rich(
