@@ -15,6 +15,9 @@ import 'package:petadopt/providers/hewan_provider.dart';
 import 'package:petadopt/providers/like_provider.dart';
 import 'package:petadopt/providers/profile_provider.dart';
 
+import 'bloc/Pengajuan Shelter/shelter_bloc.dart';
+import 'providers/pengajuanshelter_provider.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -24,6 +27,7 @@ class MyApp extends StatelessWidget {
   final Profilerepositories repositories = Profilerepositories();
   final Hewanrepositories hewanrepositories = Hewanrepositories();
   final FavoriteRepository favoriteRepository = FavoriteRepository();
+  final PermohonanAdopsiRepository shelterrepository = PermohonanAdopsiRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ProfileBloc>(create: (_) => ProfileBloc(repositories)),
         BlocProvider<HewanBloc>(create: (_) => HewanBloc(hewanrepositories)),
         BlocProvider<FavoriteBloc>(create: (_) => FavoriteBloc(favoriteRepository)),
+        BlocProvider<ShelterBloc>(create: (_) => ShelterBloc(shelterrepository)),
         
       ],
       child: MaterialApp(

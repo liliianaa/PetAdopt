@@ -12,6 +12,7 @@ import 'package:petadopt/pages/MenuPage/EditPassPage.dart';
 import 'package:petadopt/pages/MenuPage/HistoryAdoptionPage.dart';
 import 'package:petadopt/pages/MenuPage/ListHewanUploaded.dart';
 import 'package:petadopt/pages/MenuPage/MyProfilePage.dart';
+import 'package:petadopt/pages/MenuPage/AjukanShelterPage.dart';
 import 'package:petadopt/providers/profile_provider.dart';
 
 class Profilepage extends StatelessWidget {
@@ -125,6 +126,17 @@ class Profilepage extends StatelessWidget {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             Historyadoptionpage()));
+                              },
+                            ),
+                            _buildmenuitem(
+                              icon: Icons.assignment,
+                              title: 'Pengajuan Shelter',
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            AjukanShelterPage()));
                               },
                             ),
                             _buildmenuitem(
