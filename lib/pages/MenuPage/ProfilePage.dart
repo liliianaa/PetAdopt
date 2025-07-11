@@ -201,9 +201,9 @@ class Profilepage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
+              context.read<Authbloc>().add(AuthLogoutRequest());
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => LandingPage()));
-              context.read<Authbloc>().add(AuthLogoutRequest());
             },
             child: const Text('Keluar'),
           ),

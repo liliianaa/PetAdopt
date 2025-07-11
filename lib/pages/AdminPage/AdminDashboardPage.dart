@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:petadopt/bloc/admin/admin_bloc.dart';
 import 'package:petadopt/config/ColorConfig.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:petadopt/pages/AdminPage/NotikasiAdminPage.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -26,9 +27,17 @@ class AdminDashboard extends StatelessWidget {
             Image.asset('assets/logo.png', height: 40),
           ],
         ),
-        actions: const [
-          Icon(Icons.notifications_none),
-          SizedBox(width: 12),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotifikasiPage()),
+              );
+            },
+          ),
+          const SizedBox(width: 12),
         ],
       ),
       body: BlocBuilder<AdminBloc, AdminState>(
@@ -60,7 +69,7 @@ class AdminDashboard extends StatelessWidget {
                       (jumlahHewan.kucing ?? 0).toDouble(),
                       (jumlahHewan.anjing ?? 0).toDouble(),
                     ],
-                    colors: [ColorConfig.mainblue1, ColorConfig.mainblue1],
+                    colors: [ColorConfig.mainwhite, ColorConfig.mainwhite],
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -77,9 +86,9 @@ class AdminDashboard extends StatelessWidget {
                       (jumlahUser.admin ?? 0).toDouble(),
                     ],
                     colors: [
-                      ColorConfig.mainblue1,
-                      ColorConfig.mainblue1,
-                      ColorConfig.mainblue1
+                      ColorConfig.mainwhite,
+                      ColorConfig.mainwhite,
+                      ColorConfig.mainwhite,
                     ],
                   ),
                 ],
@@ -106,7 +115,7 @@ class AdminDashboard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ColorConfig.mainwhite,
+        color: ColorConfig.mainblue,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -115,9 +124,9 @@ class AdminDashboard extends StatelessWidget {
           Text(
             '$total',
             style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: ColorConfig.mainwhite),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -152,9 +161,16 @@ class AdminDashboard extends StatelessWidget {
                       showTitles: true,
                       getTitlesWidget: (value, _) {
                         if (value.toInt() < labels.length) {
-                          return Text(labels[value.toInt()]);
+                          return Text(
+                            labels[value.toInt()],
+                            style:
+                                const TextStyle(color: ColorConfig.mainwhite),
+                          );
                         }
-                        return const Text('');
+                        return const Text(
+                          '',
+                          style: TextStyle(color: ColorConfig.mainwhite),
+                        );
                       },
                     ),
                   ),

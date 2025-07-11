@@ -38,6 +38,11 @@ class dashboardAdminsuccess extends AdminState {
   }
 }
 
+final class getnotifikasiSuccess extends AdminState {
+  final List<NotifikasiMod> datanotifikasi;
+  getnotifikasiSuccess({required this.datanotifikasi});
+}
+
 final class Adminerror extends AdminState {
   final String? message;
 

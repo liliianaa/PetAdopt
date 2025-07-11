@@ -7,6 +7,7 @@ import 'package:petadopt/model/List_shelter_admin.dart';
 import 'package:http/http.dart' as http;
 import 'package:petadopt/model/acc_pemohon_model.dart';
 import 'package:petadopt/model/dashboard_admin_model.dart';
+import 'package:petadopt/model/getNotifikasiAdmin_model.dart';
 
 class Adminrepository {
   final String _BaseURL = 'http://10.0.2.2:8000/api/admin';
@@ -104,6 +105,33 @@ class Adminrepository {
       }
     } catch (e) {
       throw Exception('Error saat update status: $e');
+    }
+  }
+
+  Future<List<NotifikasiMod>> getnotifikasi() async {
+    try {
+      final token = await _tokenManager.getToken();
+      final response = await http.get(
+        Uri.parse('$_BaseURL/notifikasi'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+       final jsonData = jsonDecode(response.body);
+        final data = jsonData['data'];
+        if (data is List) {
+          return data.map((e) => NotifikasiMod.fromMap(e)).toList();
+        } else {
+          throw Exception('Data tidak valid');
+        }
+      } else {
+        final jsonData = jsonDecode(response.body);
+        throw Exception(jsonData['message'] ?? 'Gagal memuat data');
+      }
+    } catch (e) {
+      throw Exception(e);
     }
   }
 }
