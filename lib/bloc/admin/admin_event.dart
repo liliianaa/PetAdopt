@@ -22,3 +22,6 @@ class getjumlahuser extends AdminEvent {
 class getjumlahhewan extends AdminEvent {
   getjumlahhewan();
 }
+class getNotifikasi extends AdminEvent{
+  getNotifikasi();
+}

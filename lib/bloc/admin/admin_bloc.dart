@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:petadopt/model/List_shelter_admin.dart';
 import 'package:petadopt/model/acc_pemohon_model.dart';
 import 'package:petadopt/model/dashboard_admin_model.dart';
+import 'package:petadopt/model/getNotifikasiAdmin_model.dart';
 import 'package:petadopt/providers/admin_provider.dart';
 
 part 'admin_event.dart';
@@ -59,6 +60,15 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
           jumlahUser: current?.jumlahUser,
           jumlahHewan: hewanData,
         ));
+      } catch (e) {
+        emit(Adminerror(message: e.toString()));
+      }
+    });
+    on<getNotifikasi>((event, emit) async {
+      emit(AdminLoading());
+      try {
+        final notifikasi = await adminrepository.getnotifikasi();
+        emit(getnotifikasiSuccess(datanotifikasi: notifikasi));
       } catch (e) {
         emit(Adminerror(message: e.toString()));
       }
