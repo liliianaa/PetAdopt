@@ -95,7 +95,7 @@ class DataPengajuanShelterPage extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const DataPengajuanShelterPage()));
+                                          const AdminMainPage()));
                             },
                             child: const Text(
                               'Tolak',
@@ -115,7 +115,7 @@ class DataPengajuanShelterPage extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const DataPengajuanShelterPage()));
+                                          const AdminMainPage()));
                             },
                             child: const Text(
                               'Terima',

@@ -14,6 +14,12 @@ final class ProfileSuccess extends ProfileState {
   ProfileSuccess({required this.profiledata});
 }
 
+final class ProfiledetailSuccess extends ProfileState {
+  final DetailProfileModel profiledetilmodel;
+
+  ProfiledetailSuccess({required this.profiledetilmodel});
+}
+
 final class ProfileError extends ProfileState {
   final String message;
 

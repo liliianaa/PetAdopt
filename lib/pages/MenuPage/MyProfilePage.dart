@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:petadopt/bloc/Auth/AuthBloc.dart';
 import 'package:petadopt/bloc/Auth/AuthState.dart';
 import 'package:petadopt/bloc/Profile/profile_bloc.dart';
+import 'package:petadopt/config/ColorConfig.dart';
+import 'package:petadopt/model/DetailProfile_model.dart';
 import 'package:petadopt/pages/MenuPage/EditProfilePage.dart';
 import 'package:petadopt/pages/MenuPage/ProfilePage.dart';
 
@@ -35,7 +38,15 @@ class _MyprofilepageState extends State<Myprofilepage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: BackButton(color: Colors.blue),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Profilepage()),
+              );
+            },
+            icon: const Icon(Icons.arrow_back, color: ColorConfig.mainblue1),
+          ),
           title: const Text(
             'Profil Saya',
             style: TextStyle(
@@ -95,7 +106,15 @@ class _MyprofilepageState extends State<Myprofilepage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Editprofilepage()),
+                                builder: (context) => Editprofilepage(
+                                        profiledata: DetailProfileModel(
+                                      name: data['name'],
+                                      tanggalLahir: _parseTanggalLahir(
+                                          data['tanggal_lahir']),
+                                      jenisKelamin: data['jenis_kelamin'],
+                                      noTelp: data['no_telp'],
+                                      email: data['email'],
+                                    ))),
                           );
                         }, // aksi untuk tombol ini
                         child: Image.asset(
@@ -152,6 +171,25 @@ class _MyprofilepageState extends State<Myprofilepage> {
         ),
       ),
     );
+  }
+
+  DateTime? _parseTanggalLahir(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return null;
+
+    try {
+      // Contoh format tanggal: "2000-03-14" atau "14-03-2000"
+      if (dateStr.contains('-')) {
+        if (dateStr.split('-')[0].length == 4) {
+          return DateTime.parse(dateStr); // format yyyy-MM-dd
+        } else {
+          return DateFormat('dd-MM-yyyy').parse(dateStr); // format dd-MM-yyyy
+        }
+      }
+    } catch (e) {
+      return null;
+    }
+
+    return null;
   }
 }
 

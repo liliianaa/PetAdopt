@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:petadopt/helper/SharedPrefHelper.dart';
+import 'package:petadopt/model/DetailProfile_model.dart';
 
 class Profilerepositories {
   final String _BaseURL = 'http://10.0.2.2:8000/api/user';
@@ -49,8 +50,8 @@ class Profilerepositories {
     }
   }
 
-  Future<Map<String, dynamic>> ProfileUpdate(String name, String tgl_lahir,
-      String jenis_kelamin, String no_telp, String email) async {
+  Future<DetailProfileModel> ProfileUpdate(
+      DetailProfileModel Profiledetailmodel) async {
     try {
       final token = await _tokenManager.getToken();
       final response = await http.put(
@@ -58,24 +59,19 @@ class Profilerepositories {
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: {
-          'name': name,
-          'tgl_lahir': tgl_lahir,
-          'jenis_kelamin': jenis_kelamin,
-          'no_telp': no_telp,
-          'email': email
-        },
+        body: jsonEncode(Profiledetailmodel.toMap()),
+        // print("Body yang dikirim: ${jsonEncode(Profiledetailmodel.toMap())}");
+        // print("Response: ${response.body}");
       );
-      final json = jsonDecode(response.body);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'success': true, 'data': json['data'], 'token': token};
+      if (response.statusCode == 200) {
+        return DetailProfileModel.fromJson(response.body);
       } else {
-        final errorMessage = json['message'] ?? 'Gagal Update Profile';
-        return {'success': false, 'message': errorMessage};
+        throw Exception("Gagal memuat data profil");
       }
     } catch (e) {
-      return {'success': false, 'message': 'Terjadi kesalahan server.'};
+      throw Exception("tidak ada data");
     }
   }
 
