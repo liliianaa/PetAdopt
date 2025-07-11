@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadopt/model/DetailProfile_model.dart';
 
 import 'package:petadopt/providers/profile_provider.dart';
 
@@ -32,12 +33,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
     on<UpdateProfileEvent>((event, emit) async {
       emit(ProfileLoading());
-      final response = await repositories.ProfileUpdate(event.name,
-          event.tgl_lahir, event.jenis_kelamin, event.no_telp, event.email);
-      if (response['success'] && response['data'] != null) {
-        emit(ProfileSuccess(profiledata: response['data']));
-      } else {
-        emit(ProfileError(message: response['message']));
+      try {
+        final datadetailprofile =
+            await repositories.ProfileUpdate(event.profiledetailmodel);
+        emit(ProfiledetailSuccess(profiledetilmodel: datadetailprofile));
+      } catch (e) {
+        emit(ProfileError(message: e.toString()));
       }
     });
     on<ProfilePassUpdate>((event, emit) async {

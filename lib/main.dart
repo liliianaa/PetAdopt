@@ -7,17 +7,16 @@ import 'package:petadopt/bloc/Profile/profile_bloc.dart';
 import 'package:petadopt/bloc/admin/admin_bloc.dart';
 import 'package:petadopt/bloc/favorite/favorite_bloc.dart';
 import 'package:petadopt/bloc/hewan/hewan_bloc.dart';
+import 'package:petadopt/bloc/shelter/shelter_bloc.dart';
 import 'package:petadopt/helper/SharedPrefHelper.dart';
-import 'package:petadopt/pages/AdminPage/AdminDashboardPage.dart';
 import 'package:petadopt/pages/AdminPage/NavbarAdmin.dart';
 import 'package:petadopt/pages/MainPage.dart';
 import 'package:petadopt/pages/LandingPage.dart';
-import 'package:petadopt/pages/MenuPage/AddHewanPage.dart';
-import 'package:petadopt/pages/MenuPage/KatalogPage.dart';
 import 'package:petadopt/providers/admin_provider.dart';
 import 'package:petadopt/providers/auth_provider.dart';
 import 'package:petadopt/providers/hewan_provider.dart';
 import 'package:petadopt/providers/like_provider.dart';
+import 'package:petadopt/providers/pengajuanshelter_provider.dart';
 import 'package:petadopt/providers/profile_provider.dart';
 
 void main() {
@@ -31,14 +30,16 @@ class MyApp extends StatelessWidget {
   final Adminrepository adminrepositories = Adminrepository();
   final FavoriteRepository favoriteRepository = FavoriteRepository();
   final SharedPrefHelper _helper = SharedPrefHelper();
+  final PermohonanAdopsiRepository Shelterrepository =
+      PermohonanAdopsiRepository();
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<Authbloc>(
-          create: (_) =>
-              Authbloc(authrepostories: authrepostories)..add(AuthCheckStatus()),
+          create: (_) => Authbloc(authrepostories: authrepostories)
+            ..add(AuthCheckStatus()),
         ),
         BlocProvider<ProfileBloc>(
           create: (_) => ProfileBloc(repositories),
@@ -51,6 +52,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<FavoriteBloc>(
           create: (_) => FavoriteBloc(favoriteRepository),
+        ),
+        BlocProvider<ShelterBloc>(
+          create: (_) => ShelterBloc(Shelterrepository),
         ),
       ],
       child: MaterialApp(

@@ -32,6 +32,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   equatable: ^2.0.5
+  file_picker: ^10.2.0
   fl_chart: ^1.0.0
   flutter:
     sdk: flutter
@@ -39,17 +40,11 @@ dependencies:
   font_awesome_flutter: ^10.5.0
   image_picker: ^1.0.7
   intl: ^0.20.2
+  mime: ^2.0.0
   provider: ^6.1.5
   shared_preferences: ^2.2.2
 
 dev_dependencies:
-
-  # http: ^0.13.6
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
